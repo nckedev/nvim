@@ -28,6 +28,7 @@ color nord
 syntax on
 filetype plugin indent on
 set number
+set termguicolors
 set hidden
 set hlsearch
 set ignorecase
