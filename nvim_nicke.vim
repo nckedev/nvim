@@ -1,4 +1,5 @@
 call plug#begin()
+	Plug 'https://github.com/nanotech/jellybeans.vim'
 	Plug 'OmniSharp/omnisharp-vim'
 	Plug 'kabouzeid/nvim-lspinstall'
 	Plug 'hrsh7th/nvim-compe'
@@ -90,6 +91,7 @@ ca Wq wq
 ca WQ wq
 ca WQ wq
 
+"hi Normal ctermbg=darkgray
 highlight LineNr ctermfg=darkgray
 hi StatusLine ctermfg=darkgray
 hi Statement ctermfg=14
@@ -116,6 +118,45 @@ elseif has("win32")
 endif
 lua require'lspconfig'.omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
 
+lua << EOF
+local sumneko_root_path = vim.fn.getenv("HOME").."/.local/share/nvim/lspinstall/lua" -- Change to your sumneko root installation
+--local sumneko_binary = sumneko_root_path .. '/extension/server/bin/macOS/lua-language-server'
+local sumneko_binary = sumneko_root_path .. '/sumneko-lua-language-server'
+
+
+-- Make runtime files discoverable to the server
+local runtime_path = vim.split(package.path, ';')
+table.insert(runtime_path, 'lua/?.lua')
+table.insert(runtime_path, 'lua/?/init.lua')
+
+require('lspconfig').sumneko_lua.setup {
+  cmd = { sumneko_binary, '-E', sumneko_root_path .. '/main.lua' },
+  on_attach = on_attach,
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      runtime = {
+        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+        version = 'LuaJIT',
+        -- Setup your lua path
+        path = runtime_path,
+      },
+      diagnostics = {
+        -- Get the language server to recognize the `vim` global
+        globals = { 'vim' },
+      },
+      workspace = {
+        -- Make the server aware of Neovim runtime files
+        library = vim.api.nvim_get_runtime_file('', true),
+      },
+      -- Do not send telemetry data containing a randomized but unique identifier
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
+}
+EOF
 lua << EOF
 -- Compe setup
 require'compe'.setup {
