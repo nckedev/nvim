@@ -1,6 +1,5 @@
 call plug#begin()
 
-	Plug 'https://github.com/nanotech/jellybeans.vim'
 	Plug 'OmniSharp/omnisharp-vim'
 	Plug 'kabouzeid/nvim-lspinstall'
 	Plug 'hrsh7th/nvim-compe'
@@ -12,8 +11,12 @@ call plug#begin()
 	Plug 'nvim-lua/plenary.nvim'
 	Plug 'nvim-telescope/telescope.nvim'
 
+	Plug 'kyazdani42/nvim-web-devicons'
 	Plug 'nvim-treesitter/nvim-treesitter', {'do': 'TSUpdate'}
 	Plug 'arcticicestudio/nord-vim'
+	Plug 'nanotech/jellybeans.vim'
+	Plug 'morhetz/gruvbox'
+	Plug 'chriskempson/base16-vim'
 
 	Plug 'easymotion/vim-easymotion'
 	Plug 'phaazon/hop.nvim'
@@ -53,17 +56,18 @@ let g:mapleader = "\<Space>"
 if has('mouse')
 	set mouse=a
 endif
-
+lua theme= require('telescope.themes').get_ivy { shorten_path=true }
 nnoremap <leader>r <cmd>lua vim.lsp.buf.rename()<cr>
 nnoremap <leader>K <cmd>lua vim.lsp.buf.hover()<cr>
-"nnoremap <leader>ca <cmd>lua vim.lsp.buf.code_action()<cr>
-nnoremap <leader>ca <cmd> lua require'telescope.builtin'.lsp_code_actions{}<cr>
+nnoremap <leader>ca <cmd>Telescope lsp_code_actions theme=get_cursor<cr>
+"nnoremap <leader>ca <cmd>lua vim.lsp.buf.code_action() theme=get_ivy<cr>
+"nnoremap <leader>ca <cmd> lua require'telescope.builtin'.lsp_code_actions{}<cr>
 nnoremap <leader>t <cmd>lua vim.lsp.buf.formatting()<cr>
 nnoremap <leader>n <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
 nnoremap <leader>p <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
 
 nnoremap <leader>fb <cmd>Telescope buffers show_all_buffers=true<cr>
-nnoremap <leader>ff <cmd>Telescope current_buffer_fuzzy_find<cr>
+nnoremap <leader>ff <cmd>Telescope current_buffer_fuzzy_find theme=get_ivy previewer=false<cr>
 nnoremap <leader>fF <cmd>Telescope find_files<cr>
 nnoremap <leader>fB <cmd>Telescope file_browser<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
@@ -102,7 +106,11 @@ ca Wq wq
 ca WQ wq
 ca WQ wq
 
-"hi Normal ctermbg=darkgray
+"Telescope
+hi TelescopeMatching guifg=lightblue
+
+"remove bgcolor for some themes
+"hi Normal guifg=None
 highlight LineNr ctermfg=darkgray
 hi StatusLine ctermfg=darkgray
 hi Statement ctermfg=14
@@ -110,6 +118,8 @@ hi Type ctermfg=13
 highlight Pmenu ctermbg=darkgray ctermfg=white
 highlight PmenuSel ctermbg=white ctermfg=black
 highlight MatchParen ctermbg=darkgray ctermfg=white
+
+lua require('telescope').setup{ color_devicons=true }
 
 lua << EOF
 --require'lspconfig'.dls.setup{}
