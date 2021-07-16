@@ -26,6 +26,7 @@ call plug#end()
 
 
 
+language en_US
 color nord
 syntax on
 filetype plugin indent on
@@ -116,21 +117,23 @@ EOF
 
 lua << EOF
 --npm i -g pyright
---require'lspconfig'.pyright.setup{on_attach=require'completion'.on_attach}
-local nvim_lsp = require('lspconfig')
-local servers = { 'pyright' }
-for _, lsp in ipairs(servers) do
-  nvim_lsp[lsp].setup { on_attach = on_attach }
-end
+require('lspconfig').pyright.setup{on_attach=on_attach}
+--local nvim_lsp = require('lspconfig')
+--local servers = { 'pyright' }
+--for _, lsp in ipairs(servers) do
+--  nvim_lsp[lsp].setup { on_attach = on_attach }
+--end
 EOF
+lua << EOF
+local pid = vim.fn.getpid()
 
-lua local pid = vim.fn.getpid()
-if has("mac")
-	lua local omnisharp_bin = "/Users/nicke/.cache/omnisharp-vim/omnisharp-roslyn/run"
-elseif has("win32")
-	lua local omnisharp_bin = ""
-endif
-lua require'lspconfig'.omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
+if vim.fn.has("mac") then
+	local omnisharp_bin = "/Users/nicke/.cache/omnisharp-vim/omnisharp-roslyn/run"
+elseif vim.fn.has("win") then --??
+	local omnisharp_bin = ""
+end
+require('lspconfig').omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
+EOF
 
 lua << EOF
 local sumneko_root_path = vim.fn.getenv("HOME").."/.local/share/nvim/lspinstall/lua" -- Change to your sumneko root installation
@@ -173,7 +176,7 @@ require('lspconfig').sumneko_lua.setup {
 EOF
 lua << EOF
 -- Compe setup
-require'compe'.setup {
+require('compe').setup {
   enabled = true;
   autocomplete = true;
   debug = false;
