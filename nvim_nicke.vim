@@ -1,4 +1,5 @@
 call plug#begin()
+
 	Plug 'https://github.com/nanotech/jellybeans.vim'
 	Plug 'OmniSharp/omnisharp-vim'
 	Plug 'kabouzeid/nvim-lspinstall'
@@ -31,7 +32,7 @@ filetype plugin indent on
 set number
 set termguicolors
 set hidden
-set hlsearch
+set nohlsearch
 set ignorecase
 set smartcase
 set nobackup
@@ -52,9 +53,18 @@ if has('mouse')
 	set mouse=a
 endif
 
+nnoremap <leader>r <cmd>lua vim.lsp.buf.rename()<cr>
+nnoremap <leader>K <cmd>lua vim.lsp.buf.hover()<cr>
+"nnoremap <leader>ca <cmd>lua vim.lsp.buf.code_action()<cr>
+nnoremap <leader>ca <cmd> lua require'telescope.builtin'.lsp_code_actions{}<cr>
+nnoremap <leader>t <cmd>lua vim.lsp.buf.formatting()<cr>
+nnoremap <leader>n <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
+nnoremap <leader>p <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
+
 nnoremap <leader>fb <cmd>Telescope buffers show_all_buffers=true<cr>
 nnoremap <leader>ff <cmd>Telescope current_buffer_fuzzy_find<cr>
 nnoremap <leader>fF <cmd>Telescope find_files<cr>
+nnoremap <leader>fB <cmd>Telescope file_browser<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>4 :w<cr>:!rdmd %<cr>
 nnoremap <leader>5 :w<cr>:!rdmd -unittest %<cr>
@@ -99,6 +109,10 @@ hi Type ctermfg=13
 highlight Pmenu ctermbg=darkgray ctermfg=white
 highlight PmenuSel ctermbg=white ctermfg=black
 highlight MatchParen ctermbg=darkgray ctermfg=white
+
+lua << EOF
+--require'lspconfig'.dls.setup{}
+EOF
 
 lua << EOF
 --npm i -g pyright
