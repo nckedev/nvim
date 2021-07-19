@@ -1,10 +1,12 @@
 call plug#begin()
+	Plug 'tpope/vim-commentary'
 
 	Plug 'OmniSharp/omnisharp-vim'
 	Plug 'kabouzeid/nvim-lspinstall'
 	Plug 'hrsh7th/nvim-compe'
 	Plug 'neovim/nvim-lspconfig'
 
+	Plug 'folke/trouble.nvim'
 	Plug 'dense-analysis/ale'
 
 	Plug 'nvim-lua/popup.nvim'
@@ -19,6 +21,7 @@ call plug#begin()
 	Plug 'chriskempson/base16-vim'
 
 	Plug 'easymotion/vim-easymotion'
+	"Plug 'ggandor/lightspeed.nvim'
 	Plug 'phaazon/hop.nvim'
 
 	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -28,9 +31,8 @@ call plug#begin()
 call plug#end()
 
 
-
-language en_US
 color nord
+language en_US
 syntax on
 filetype plugin indent on
 set number
@@ -66,7 +68,8 @@ nnoremap <leader>t <cmd>lua vim.lsp.buf.formatting()<cr>
 nnoremap <leader>n <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
 nnoremap <leader>p <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
 
-nnoremap <leader>fb <cmd>Telescope buffers show_all_buffers=true<cr>
+nnoremap <leader>fr <cmd>Telescope registers<cr>
+nnoremap <leader>fb <cmd>Telescope buffers show_all_buffers=true theme=get_ivy<cr>
 nnoremap <leader>ff <cmd>Telescope current_buffer_fuzzy_find theme=get_ivy previewer=false<cr>
 nnoremap <leader>fF <cmd>Telescope find_files<cr>
 nnoremap <leader>fB <cmd>Telescope file_browser<cr>
@@ -139,7 +142,7 @@ local pid = vim.fn.getpid()
 
 if vim.fn.has("mac") then
 	local omnisharp_bin = "/Users/nicke/.cache/omnisharp-vim/omnisharp-roslyn/run"
-elseif vim.fn.has("win") then --??
+elseif vim.fn.has("win32") then --??
 	local omnisharp_bin = ""
 end
 require('lspconfig').omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
@@ -149,7 +152,6 @@ lua << EOF
 local sumneko_root_path = vim.fn.getenv("HOME").."/.local/share/nvim/lspinstall/lua" -- Change to your sumneko root installation
 --local sumneko_binary = sumneko_root_path .. '/extension/server/bin/macOS/lua-language-server'
 local sumneko_binary = sumneko_root_path .. '/sumneko-lua-language-server'
-
 
 -- Make runtime files discoverable to the server
 local runtime_path = vim.split(package.path, ';')
