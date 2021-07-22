@@ -5,7 +5,7 @@ call plug#begin()
 	Plug 'kabouzeid/nvim-lspinstall'
 	Plug 'hrsh7th/nvim-compe'
 	Plug 'neovim/nvim-lspconfig'
-
+	Plug 'glepnir/lspsaga.nvim'
 	Plug 'folke/trouble.nvim'
 	Plug 'dense-analysis/ale'
 
@@ -30,7 +30,12 @@ call plug#begin()
 	Plug 'vim-airline/vim-airline-themes'
 call plug#end()
 
-
+lua << END
+--lua saga.init_lsp_saga{ settings }
+require('lspsaga').init_lsp_saga {
+	use_saga_diagnostic_sign = true,
+}
+END
 color nord
 language en_US
 syntax on
@@ -61,12 +66,19 @@ endif
 lua theme= require('telescope.themes').get_ivy { shorten_path=true }
 nnoremap <leader>r <cmd>lua vim.lsp.buf.rename()<cr>
 nnoremap <leader>K <cmd>lua vim.lsp.buf.hover()<cr>
+
+nnoremap <leader>d <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<cr>
+nnoremap <leader>dn <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
+nnoremap <leader>dp <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
+
+nnoremap <leader>gd <cmd>lua vim.lsp.buf.definition()<cr>
+"nnoremap <leader>gr <cmd>lua vim.lsp.buf.references()<cr>
+nnoremap <leader>gr <cmd>Telescope lsp_references theme=get_ivy<cr>
+nnoremap <leader>gi <cmd>lua vim.lsp.buf.implementation()<cr>
 nnoremap <leader>ca <cmd>Telescope lsp_code_actions theme=get_cursor<cr>
 "nnoremap <leader>ca <cmd>lua vim.lsp.buf.code_action() theme=get_ivy<cr>
 "nnoremap <leader>ca <cmd> lua require'telescope.builtin'.lsp_code_actions{}<cr>
 nnoremap <leader>t <cmd>lua vim.lsp.buf.formatting()<cr>
-nnoremap <leader>n <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
-nnoremap <leader>p <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
 
 nnoremap <leader>fr <cmd>Telescope registers<cr>
 nnoremap <leader>fb <cmd>Telescope buffers show_all_buffers=true theme=get_ivy<cr>
@@ -77,7 +89,19 @@ nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>4 :w<cr>:!rdmd %<cr>
 nnoremap <leader>5 :w<cr>:!rdmd -unittest %<cr>
 map <C-f> <Plug>(easymotion-sn)
-
+lua << EOF
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+vim.lsp.diagnostic.on_publish_diagnostics, {
+	-- Enable underline, use default values
+	underline = true,
+	-- Enable virtual text, override spacing to 4
+	virtual_text = false,
+	signs = true,
+	-- Use a function to dynamically turn signs off
+	-- and on, using buffer local variables
+	}
+)
+EOF
 nmap <f7> :source ~/.config/nvim/init.vim<cr>
 inoremap <c-f> (
 inoremap <c-j> )
@@ -140,10 +164,11 @@ EOF
 lua << EOF
 local pid = vim.fn.getpid()
 
+local omnisharp_bin = ""
 if vim.fn.has("mac") then
-	local omnisharp_bin = "/Users/nicke/.cache/omnisharp-vim/omnisharp-roslyn/run"
+	 omnisharp_bin = "/Users/nicke/.cache/omnisharp-vim/omnisharp-roslyn/run"
 elseif vim.fn.has("win32") then --??
-	local omnisharp_bin = ""
+	 omnisharp_bin = ""
 end
 require('lspconfig').omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
 EOF
