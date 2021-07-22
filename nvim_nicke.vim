@@ -68,6 +68,7 @@ lua theme= require('telescope.themes').get_ivy { shorten_path=true }
 nnoremap <leader>r <cmd>lua vim.lsp.buf.rename()<cr>
 nnoremap <leader>K <cmd>lua vim.lsp.buf.hover()<cr>
 
+"nnoremap <leader>d <cmd>Lspsaga show_line_diagnostics<cr>
 nnoremap <leader>d <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<cr>
 nnoremap <leader>dn <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
 nnoremap <leader>dp <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
