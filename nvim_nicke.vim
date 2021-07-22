@@ -1,4 +1,6 @@
 call plug#begin()
+	"lspsaga
+	"gitgutter
 	Plug 'tpope/vim-commentary'
 
 	Plug 'OmniSharp/omnisharp-vim'
@@ -78,6 +80,9 @@ nnoremap <leader>4 :w<cr>:!rdmd %<cr>
 nnoremap <leader>5 :w<cr>:!rdmd -unittest %<cr>
 map <C-f> <Plug>(easymotion-sn)
 
+nnoremap Q q
+nnoremap q <cmd>Telescope<cr>
+
 nmap <f7> :source ~/.config/nvim/init.vim<cr>
 inoremap <c-f> (
 inoremap <c-j> )
@@ -124,6 +129,8 @@ highlight MatchParen ctermbg=darkgray ctermfg=white
 
 lua require('telescope').setup{ color_devicons=true }
 
+
+lua require('lspconfig').serve_d.setup{}
 lua << EOF
 --require'lspconfig'.dls.setup{}
 EOF
