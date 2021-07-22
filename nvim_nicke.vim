@@ -1,6 +1,5 @@
 call plug#begin()
-	"lspsaga
-	"gitgutter
+	Plug 'airblade/vim-gitgutter'
 	Plug 'tpope/vim-commentary'
 
 	Plug 'OmniSharp/omnisharp-vim'
