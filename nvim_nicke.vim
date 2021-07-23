@@ -68,11 +68,12 @@ lua theme= require('telescope.themes').get_ivy { shorten_path=true }
 nnoremap <leader>r <cmd>lua vim.lsp.buf.rename()<cr>
 nnoremap <leader>K <cmd>lua vim.lsp.buf.hover()<cr>
 
-"nnoremap <leader>d <cmd>Lspsaga show_line_diagnostics<cr>
+nnoremap <leader>dl <cmd>Lspsaga show_line_diagnostics<cr>
 nnoremap <leader>d <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<cr>
 nnoremap <leader>dn <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
 nnoremap <leader>dp <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
 
+nnoremap <leader>gt <cmd>TroubleToggle<cr>
 nnoremap <leader>gd <cmd>lua vim.lsp.buf.definition()<cr>
 "nnoremap <leader>gr <cmd>lua vim.lsp.buf.references()<cr>
 nnoremap <leader>gr <cmd>Telescope lsp_references theme=get_ivy<cr>
@@ -142,8 +143,13 @@ ca WQ wq
 "Telescope
 hi TelescopeMatching guifg=lightblue
 
+"GRAY NORD THEME
+" hi Normal guibg=none
+" hi LineNr guifg=gray
+" hi Comment guifg=gray
+"
 "remove bgcolor for some themes
-"hi Normal guifg=None
+"hi Normal guibg=None
 highlight LineNr ctermfg=darkgray
 hi StatusLine ctermfg=darkgray
 hi Statement ctermfg=14
@@ -155,7 +161,7 @@ highlight MatchParen ctermbg=darkgray ctermfg=white
 lua require('telescope').setup{ color_devicons=true }
 
 
-lua require('lspconfig').serve_d.setup{}
+lua require('lspconfig').serve_d.setup{on_attach=on_attach}
 lua << EOF
 --require'lspconfig'.dls.setup{}
 EOF
@@ -226,7 +232,8 @@ require('compe').setup {
   autocomplete = true;
   debug = false;
   min_length = 1;
-  preselect = 'enable';
+  --preselect = 'enable';
+  preselect = 'disable';
   throttle_time = 80;
   source_timeout = 200;
   incomplete_delay = 400;
@@ -238,6 +245,7 @@ require('compe').setup {
   source = {
     path = true;
     nvim_lsp = true;
+	calc = true;
   };
 }
 
