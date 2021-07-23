@@ -179,13 +179,23 @@ lua << EOF
 local pid = vim.fn.getpid()
 
 local omnisharp_bin = ""
-if vim.fn.has("mac") then
+if vim.fn.has("mac") == 1 then
 	 omnisharp_bin = "/Users/nicke/.cache/omnisharp-vim/omnisharp-roslyn/run"
-elseif vim.fn.has("win32") then --??
-	 omnisharp_bin = ""
+elseif vim.fn.has("win32") == 1 then --??
+	 omnisharp_bin = "c:/Users/nmk41/AppData/Local/omnisharp-vim/omnisharp-roslyn/OmniSharp.exe"
+else 
+	omnisharp_bin = "ERROR"
 end
 require('lspconfig').omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
 EOF
+
+"========= ALE SETTINGS ================
+let g:ale_linters = {'cs': ['OmniSharp']}
+let g:ale_sign_gutter_column_always = 1
+let g:ale_sign_error = '>>'
+let g:ale_sign_warnign = '--'
+"hi clear ALEErrorSign
+"hi clear ALEWarnSign
 
 lua << EOF
 local sumneko_root_path = vim.fn.getenv("HOME").."/.local/share/nvim/lspinstall/lua" -- Change to your sumneko root installation
