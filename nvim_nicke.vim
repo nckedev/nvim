@@ -37,6 +37,7 @@ require('lspsaga').init_lsp_saga {
 	use_saga_diagnostic_sign = true,
 }
 END
+
 color nord
 language en_US
 syntax on
@@ -192,8 +193,8 @@ EOF
 "========= ALE SETTINGS ================
 let g:ale_linters = {'cs': ['OmniSharp']}
 let g:ale_sign_gutter_column_always = 1
-let g:ale_sign_error = '>>'
-let g:ale_sign_warnign = '--'
+let g:ale_sign_error = ''
+let g:ale_sign_warning = ''
 "hi clear ALEErrorSign
 "hi clear ALEWarnSign
 
