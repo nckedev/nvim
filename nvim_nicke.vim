@@ -93,6 +93,10 @@ nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>4 :w<cr>:!rdmd %<cr>
 nnoremap <leader>5 :w<cr>:!rdmd -unittest %<cr>
 map <C-f> <Plug>(easymotion-sn)
+
+
+autocmd FileType cs nmap <silent> <buffer> <leader>h <Plug>(omnisharp_signature_help)
+autocmd FileType cs nmap <silent> <buffer> <leader>gd <Plug>(omnisharp_go_to_defenition)
 lua << EOF
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 vim.lsp.diagnostic.on_publish_diagnostics, {
