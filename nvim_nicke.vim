@@ -63,6 +63,7 @@ nnoremap <leader>r <cmd>lua vim.lsp.buf.rename()<cr>
 nnoremap <leader>K <cmd>lua vim.lsp.buf.hover()<cr>
 
 nnoremap <leader>dl <cmd>Lspsaga show_line_diagnostics<cr>
+nnoremap <leader>ds <cmd>Lspsaga signature_help<cr>
 nnoremap <leader>d <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<cr>
 nnoremap <leader>dn <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
 nnoremap <leader>dp <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
@@ -78,11 +79,8 @@ nnoremap <leader>ca <cmd>Telescope lsp_code_actions theme=get_cursor<cr>
 nnoremap <leader>t <cmd>lua vim.lsp.buf.formatting()<cr>
 
 nnoremap <leader>fr <cmd>Telescope registers<cr>
-nnoremap <leader>fb <cmd>Telescope buffers show_all_buffers=true theme=get_ivy<cr>
-nnoremap <leader>ff <cmd>Telescope current_buffer_fuzzy_find theme=get_ivy previewer=false<cr>
-nnoremap <leader>fF <cmd>Telescope find_files<cr>
-nnoremap <leader>fB <cmd>Telescope file_browser<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fb <cmd>Telescope file_browser<cr>
 nnoremap <leader>4 :w<cr>:!rdmd %<cr>
 nnoremap <leader>5 :w<cr>:!rdmd -unittest %<cr>
 map <C-f> <Plug>(easymotion-sn)
@@ -92,9 +90,15 @@ autocmd FileType cs nmap <silent> <buffer> <leader>h <Plug>(omnisharp_signature_
 autocmd FileType cs nmap <silent> <buffer> <leader>gd <Plug>(omnisharp_go_to_defenition)
 
 nnoremap Q q
-nnoremap q <cmd>Telescope builtin theme=get_ivy previewer=false <cr>
+nnoremap qw <cmd>Telescope lsp_document_symbols theme=get_ivy previewer=false <cr>
+nnoremap qq <cmd>Telescope buffers theme=get_ivy previewer=false show_all_buffers=true <cr>
+nnoremap qa <cmd>Telescope builtin theme=get_ivy previewer=false <cr>
+nnoremap qr <cmd>Telescope live_grep theme=get_ivy previewer=false <cr>
+nnoremap qe <cmd>Telescope current_buffer_fuzzy_find theme=get_ivy previewer=false<cr>
+nnoremap qh <cmd>Telescope help_tags theme=get_ivy previewer=false<cr>
 
-nmap <f7> :source ~/.config/nvim/init.vim<cr>
+nmap <f7> :source ~/.config/nvim/nvim_nicke.vim<cr>
+nmap <f8> :e ~/.config/nvim/init.vim<cr>
 inoremap <c-f> (
 inoremap <c-j> )
 inoremap <c-g> [
@@ -123,10 +127,9 @@ ca W w
 ca Q q
 ca Wq wq
 ca WQ wq
-ca WQ wq
 
 "Telescope
-hi TelescopeMatching guifg=lightblue
+hi TelescopeMatching guifg=lightgreen
 
 "GRAY NORD THEME
 " hi Normal guibg=none
@@ -148,21 +151,35 @@ let g:ale_linters = {'cs': ['OmniSharp']}
 let g:ale_sign_gutter_column_always = 1
 let g:ale_sign_error = ''
 let g:ale_sign_warning = ''
+let g:ale_sign_priority = 30
 "hi clear ALEErrorSign
 "hi clear ALEWarnSign
 
-
+"========== GitGutter ==================
+let g:git_gutter_sign_priority = 9
 
 lua << EOF
 require('lspsaga').init_lsp_saga {
 	use_saga_diagnostic_sign = true,
-	}
+	code_action_prompt = {
+		enable = true,
+		sign = true,
+		sign_priority = 20,
+		virtual_text = false,
+	},
+	code_action_keys = {
+		quit = '<esc>',
+		exec = '<cr>',
+	},
+}
+
 require('telescope').setup{ 
 	color_devicons=true,
 	theme=get_ivy
-	}
+}
 
-require('lspconfig').serve_d.setup{on_attach=on_attach}
+
+--require('lspconfig').serve_d.setup{on_attach=on_attach}
 
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
@@ -170,7 +187,7 @@ vim.lsp.diagnostic.on_publish_diagnostics, {
 	underline = true,
 	virtual_text = false,
 	signs = true,
-	}
+}
 )
 ------- Python --------
 require('lspconfig').pyright.setup{on_attach=on_attach}
@@ -188,17 +205,13 @@ end
 require('lspconfig').omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
 
 ------- lua ---------
-local sumneko_root_path =""
-local sumneko_binary = ""
-if vim.fn.has("mac") then
-	sumneko_root_path = vim.fn.getenv("HOME").."/.local/share/nvim/lspinstall/lua" -- Change to your sumneko root installation
-	--local sumneko_binary = sumneko_root_path .. '/extension/server/bin/macOS/lua-language-server'
-	sumneko_binary = sumneko_root_path .. '/sumneko-lua-language-server'
-elseif vim.fn.has("win32") then
-	--TODO Install server 
-end
+local sumneko_root_path = vim.fn.getenv("HOME").."/.local/share/nvim/lspinstall/lua" -- Change to your sumneko root installation
+--local sumneko_binary = sumneko_root_path .. '/extension/server/bin/macOS/lua-language-server'
+local sumneko_binary = sumneko_root_path .. '/sumneko-lua-language-server'
+
 -- Make runtime files discoverable to the server
 local runtime_path = vim.split(package.path, ';')
+
 table.insert(runtime_path, 'lua/?.lua')
 table.insert(runtime_path, 'lua/?/init.lua')
 
@@ -213,42 +226,47 @@ require('lspconfig').sumneko_lua.setup {
 				version = 'LuaJIT',
 				-- Setup your lua path
 				path = runtime_path,
-				},
+			},
 			diagnostics = {
 				-- Get the language server to recognize the `vim` global
-				globals = { 'vim' },
-				},
+				globals = { "vim", "use" },
+			},
 			workspace = {
 				-- Make the server aware of Neovim runtime files
-				library = vim.api.nvim_get_runtime_file('', true),
+--				library = vim.api.nvim_get_runtime_file('', true),
+				library = {
+					[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+					[vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
 				},
-			-- Do not send telemetry data containing a randomized but unique identifier
-			telemetry = {
-			enable = false,
+				-- Do not send telemetry data containing a randomized but unique identifier
+				telemetry = {
+					enable = false,
+				},
 			},
 		},
 	},
 }
 ------- Compe setup -------------
 require('compe').setup {
-enabled = true;
-autocomplete = true;
-debug = false;
-min_length = 1;
---preselect = 'enable';
-preselect = 'disable';
-throttle_time = 80;
-source_timeout = 200;
-incomplete_delay = 400;
-max_abbr_width = 100;
-max_kind_width = 100;
-max_menu_width = 100;
-documentation = true;
+	enabled = true;
+	autocomplete = true;
+	debug = false;
+	min_length = 1;
+	--preselect = 'enable';
+	preselect = 'disable';
+	throttle_time = 80;
+	source_timeout = 200;
+	incomplete_delay = 400;
+	max_abbr_width = 100;
+	max_kind_width = 100;
+	max_menu_width = 100;
+	documentation = true;
 
-source = {
-	path = true;
-	nvim_lsp = true;
-	calc = true;
+	source = {
+		path = true;
+		nvim_lsp = true;
+		nvim_lua = true;
+		calc = true;
 	};
 }
 
