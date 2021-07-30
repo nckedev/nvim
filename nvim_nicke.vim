@@ -83,8 +83,7 @@ nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fb <cmd>Telescope file_browser<cr>
 nnoremap <leader>4 :w<cr>:!rdmd %<cr>
 nnoremap <leader>5 :w<cr>:!rdmd -unittest %<cr>
-map <C-f> <Plug>(easymotion-sn)
-
+"map <C-f> <Plug>(easymotion-sn)
 
 autocmd FileType cs nmap <silent> <buffer> <leader>h <Plug>(omnisharp_signature_help)
 autocmd FileType cs nmap <silent> <buffer> <leader>gd <Plug>(omnisharp_go_to_defenition)
@@ -97,8 +96,13 @@ nnoremap qr <cmd>Telescope live_grep theme=get_ivy previewer=false <cr>
 nnoremap qe <cmd>Telescope current_buffer_fuzzy_find theme=get_ivy previewer=false<cr>
 nnoremap qh <cmd>Telescope help_tags theme=get_ivy previewer=false<cr>
 
+nnoremap Y y$
+"inoremap . .<c-g>u "undo breakpoint
+"nnoremap <BS> diw
+inoremap <s-bs> <esc>diwi
+
 nmap <f7> :source ~/.config/nvim/nvim_nicke.vim<cr>
-nmap <f8> :e ~/.config/nvim/init.vim<cr>
+nmap <f8> :e ~/.config/nvim/nvim_nicke.vim<cr>
 inoremap <c-f> (
 inoremap <c-j> )
 inoremap <c-g> [
@@ -118,8 +122,8 @@ nnoremap <silent> <C-Right> :vertical resize +3<CR>
 noremap <silent> <C-Up> :resize +3<CR>
 noremap <silent> <C-Down> :resize -3<CR>
 
-nnoremap J 10j
-nnoremap K 10k
+nnoremap J 10jzz
+nnoremap K 10kzz
 noremap H b
 noremap L w
 
@@ -177,6 +181,8 @@ require('telescope').setup{
 	color_devicons=true,
 	theme=get_ivy
 }
+
+require('nvim-treesitter').setup{}
 
 
 --require('lspconfig').serve_d.setup{on_attach=on_attach}
