@@ -89,13 +89,15 @@ autocmd FileType cs nmap <silent> <buffer> <leader>h <Plug>(omnisharp_signature_
 autocmd FileType cs nmap <silent> <buffer> <leader>gd <Plug>(omnisharp_go_to_defenition)
 
 nnoremap Q q
-nnoremap qw <cmd>Telescope lsp_document_symbols theme=get_ivy previewer=false <cr>
+nnoremap qw <cmd>Telescope lsp_workspace_symbols theme=get_ivy previewer=false <cr>
 nnoremap qq <cmd>Telescope buffers theme=get_ivy previewer=false show_all_buffers=true <cr>
 nnoremap qa <cmd>Telescope builtin theme=get_ivy previewer=false <cr>
-nnoremap qr <cmd>Telescope live_grep theme=get_ivy previewer=false <cr>
+nnoremap qg <cmd>Telescope live_grep theme=get_ivy previewer=false <cr>
 nnoremap qe <cmd>Telescope current_buffer_fuzzy_find theme=get_ivy previewer=false<cr>
 nnoremap qh <cmd>Telescope help_tags theme=get_ivy previewer=false<cr>
-
+nnoremap qr <cmd>Telescope lsp_references theme=get_ivy<cr>
+nnoremap qm <cmd>Telescope find_files theme=get_ivy previewer=false cwd='~/' <cr>
+nnoremap <c-p> <cmd>lua require"telescope.builtin".find_files( { cwd = '~' } )<cr>
 nnoremap Y y$
 "inoremap . .<c-g>u "undo breakpoint
 "nnoremap <BS> diw
@@ -177,9 +179,20 @@ require('lspsaga').init_lsp_saga {
 	},
 }
 
-require('telescope').setup{ 
-	color_devicons=true,
-	theme=get_ivy
+require('telescope').setup{
+	defaults = {
+		vimgrep_arguments = {
+			'rg',
+			'--color=never',
+			'--no-heading',
+			'--with-filename',
+			'--line-number',
+			'--column',
+			'--smart-case',
+		},
+		color_devicons=true,
+		theme=get_ivy
+	}
 }
 
 require('nvim-treesitter').setup{}
@@ -211,9 +224,9 @@ end
 require('lspconfig').omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
 
 ------- lua ---------
-local sumneko_root_path = vim.fn.getenv("HOME").."/.local/share/nvim/lspinstall/lua" -- Change to your sumneko root installation
+local sumneko_root_path = vim.fn.getenv("HOME").."/Downloads/lua-language-server" -- Change to your sumneko root installation
 --local sumneko_binary = sumneko_root_path .. '/extension/server/bin/macOS/lua-language-server'
-local sumneko_binary = sumneko_root_path .. '/sumneko-lua-language-server'
+local sumneko_binary = sumneko_root_path .. '/bin/macOS/lua-language-server'
 
 -- Make runtime files discoverable to the server
 local runtime_path = vim.split(package.path, ';')
@@ -228,6 +241,7 @@ require('lspconfig').sumneko_lua.setup {
 	settings = {
 		Lua = {
 			runtime = {
+				filetypes = { "lua" },
 				-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
 				version = 'LuaJIT',
 				-- Setup your lua path
@@ -235,7 +249,7 @@ require('lspconfig').sumneko_lua.setup {
 			},
 			diagnostics = {
 				-- Get the language server to recognize the `vim` global
-				globals = { "vim", "use" },
+				globals = { "vim" },
 			},
 			workspace = {
 				-- Make the server aware of Neovim runtime files
@@ -254,26 +268,30 @@ require('lspconfig').sumneko_lua.setup {
 }
 ------- Compe setup -------------
 require('compe').setup {
-	enabled = true;
-	autocomplete = true;
-	debug = false;
-	min_length = 1;
-	--preselect = 'enable';
-	preselect = 'disable';
-	throttle_time = 80;
-	source_timeout = 200;
-	incomplete_delay = 400;
-	max_abbr_width = 100;
-	max_kind_width = 100;
-	max_menu_width = 100;
-	documentation = true;
+	enabled = true,
+	autocomplete = true,
+	debug = false,
+	min_length = 1,
+	preselect = 'enable',
+	throttle_time = 80,
+	source_timeout = 200,
+	incomplete_delay = 400,
+	max_abbr_width = 100,
+	max_kind_width = 100,
+	max_menu_width = 100,
+	documentation = true,
 
 	source = {
-		path = true;
-		nvim_lsp = true;
-		nvim_lua = true;
-		calc = true;
-	};
+		path = true,
+		nvim_lsp = true, -- { priority = 110, menu = "lsp" },
+		nvim_lua = false, --{ priority = 200, menu = "lualsp" },
+		calc = true,
+		buffer = false,
+		spell = false,
+		tags = false,
+		omni = true, --{ priority = 10, menu = "omni"}
+		--treesitter = { priority = 200, menu ="tree" },
+	},
 }
 
 local t = function(str)
@@ -313,5 +331,25 @@ vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+
 EOF
 
+lua << EOF
+function test()
+	local a = vim.lsp.buf_request(0, 'textDocument/completion', vim.lsp.util.make_position_params(), test_handler)
+end
+
+function test_handler(err, method, result, client_id, bufnr, config)
+	print("test handleer")
+	items = vim.lsp.util.text_document_completion_list_to_complete_items(result, "")
+	print("err", vim.inspect(err))
+	print("method", vim.inspect(method))
+	print("result", vim.inspect(result))
+	print("client_id", vim.inspect(client_id))
+	print("bufnr", vim.inspect(bufnr))
+	print("config", vim.inspect(config))
+end
+
+EOF
+imap <c-space> <cmd> lua test()<cr>
+nmap <c-ö> <cmd> lua test()<cr>
