@@ -1,4 +1,6 @@
 call plug#begin()
+	Plug 'nckedev/ctrlf'
+
 	Plug 'airblade/vim-gitgutter'
 	Plug 'tpope/vim-commentary'
 	Plug 'tpope/vim-fugitive'
@@ -105,6 +107,9 @@ nnoremap <leader>5 :w<cr>:!rdmd -unittest %<cr>
 autocmd FileType cs nmap <silent> <buffer> <leader>h <Plug>(omnisharp_signature_help)
 autocmd FileType cs nmap <silent> <buffer> <leader>gd <Plug>(omnisharp_go_to_defenition)
 autocmd FileType cs nmap <f5> :!dotnet script %<cr>
+
+nnoremap <c-f> <cmd>Ctrlf<cr>
+nnoremap <c-space> <cmd>CtrlfNext<cr>
 
 nnoremap Q q
 nnoremap q <cmd>Telescope builtin theme=get_ivy previewer=false <cr>
