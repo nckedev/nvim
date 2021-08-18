@@ -1,6 +1,7 @@
 call plug#begin()
 	Plug 'airblade/vim-gitgutter'
 	Plug 'tpope/vim-commentary'
+	Plug 'tpope/vim-fugitive'
 
 	Plug 'OmniSharp/omnisharp-vim'
 	Plug 'kabouzeid/nvim-lspinstall'
@@ -10,12 +11,17 @@ call plug#begin()
 	Plug 'folke/trouble.nvim'
 	Plug 'dense-analysis/ale'
 
+	Plug 'mfussenegger/nvim-dap'
+	Plug 'rcarriga/nvim-dap-ui'
+
 	Plug 'nvim-lua/popup.nvim'
 	Plug 'nvim-lua/plenary.nvim'
 	Plug 'nvim-telescope/telescope.nvim'
+	Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
 	Plug 'kyazdani42/nvim-web-devicons'
 	Plug 'nvim-treesitter/nvim-treesitter', {'do': 'TSUpdate'}
+	Plug 'nvim-treesitter/playground'
 	Plug 'arcticicestudio/nord-vim'
 	Plug 'nanotech/jellybeans.vim'
 	Plug 'morhetz/gruvbox'
@@ -35,6 +41,10 @@ color nord
 language en_US
 syntax on
 filetype plugin indent on
+set autochdir
+set cursorline
+set scrolloff=5
+set signcolumn=yes
 set number
 set termguicolors
 set hidden
@@ -51,6 +61,9 @@ set fillchars+=vert:.
 
 set completeopt=menuone,noinsert
 
+autocmd BufRead,BufNewFile *.csx set filetype=cs
+
+luafile ~/.config/nvim/debugger.lua
 
 let g:EasyMotion_do_mapping = 0
 let g:mapleader = "\<Space>"
@@ -60,7 +73,7 @@ if has('mouse')
 endif
 lua theme = require('telescope.themes').get_ivy { shorten_path=true }
 nnoremap <leader>r <cmd>lua vim.lsp.buf.rename()<cr>
-nnoremap <leader>K <cmd>lua vim.lsp.buf.hover()<cr>
+nnoremap <leader>k <cmd>lua vim.lsp.buf.hover()<cr>
 
 nnoremap <leader>dl <cmd>Lspsaga show_line_diagnostics<cr>
 nnoremap <leader>ds <cmd>Lspsaga signature_help<cr>
@@ -87,12 +100,13 @@ nnoremap <leader>5 :w<cr>:!rdmd -unittest %<cr>
 
 autocmd FileType cs nmap <silent> <buffer> <leader>h <Plug>(omnisharp_signature_help)
 autocmd FileType cs nmap <silent> <buffer> <leader>gd <Plug>(omnisharp_go_to_defenition)
+autocmd FileType cs nmap <f5> :!dotnet script %<cr>
 
 nnoremap Q q
 nnoremap qw <cmd>Telescope lsp_workspace_symbols theme=get_ivy previewer=false <cr>
-nnoremap qq <cmd>Telescope buffers theme=get_ivy previewer=false show_all_buffers=true <cr>
+nnoremap qq <cmd>Telescope buffers theme=get_ivy previewer=false show_all_buffers=false sort_lastused=true ignore_current_buffer=true<cr>
 nnoremap qa <cmd>Telescope builtin theme=get_ivy previewer=false <cr>
-nnoremap qg <cmd>Telescope live_grep theme=get_ivy previewer=false <cr>
+nnoremap qg <cmd>Telescope live_grep theme=get_ivy previewer=false short_path=2 <cr>
 nnoremap qe <cmd>Telescope current_buffer_fuzzy_find theme=get_ivy previewer=false<cr>
 nnoremap qh <cmd>Telescope help_tags theme=get_ivy previewer=false<cr>
 nnoremap qr <cmd>Telescope lsp_references theme=get_ivy<cr>
@@ -102,6 +116,8 @@ nnoremap Y y$
 "inoremap . .<c-g>u "undo breakpoint
 "nnoremap <BS> diw
 inoremap <s-bs> <esc>diwi
+
+vnoremap r :s/<c-r><c-w>/<left><left>
 
 nmap <f7> :source ~/.config/nvim/nvim_nicke.vim<cr>
 nmap <f8> :e ~/.config/nvim/nvim_nicke.vim<cr>
@@ -138,9 +154,12 @@ ca WQ wq
 hi TelescopeMatching guifg=lightgreen
 
 "GRAY NORD THEME
-" hi Normal guibg=none
-" hi LineNr guifg=gray
-" hi Comment guifg=gray
+ hi Normal guibg=none guifg=LightGray
+ hi LineNr guifg=gray
+ hi Comment guifg=gray
+ hi SignColumn guibg=none
+ hi cursorline guibg= gray22
+ hi VertSplit guibg=gray22
 "
 "remove bgcolor for some themes
 "hi Normal guibg=None
@@ -180,25 +199,39 @@ require('lspsaga').init_lsp_saga {
 }
 
 require('telescope').setup{
-	defaults = {
-		vimgrep_arguments = {
-			'rg',
-			'--color=never',
-			'--no-heading',
-			'--with-filename',
-			'--line-number',
-			'--column',
-			'--smart-case',
+defaults = {
+	vimgrep_arguments = {
+		'rg',
+		'--color=never',
+		'--no-heading',
+		'--with-filename',
+		'--line-number',
+		'--column',
+		'--smart-case',
 		},
-		color_devicons=true,
-		theme=get_ivy
-	}
+	color_devicons=true,
+	theme=get_ivy
+	},
+extensions = {
+	fzf = {
+		fuzzy = true,
+		override_generic_sorter = true,
+		override_file_sorter = true,
+		case_mode = 'smart_case',
+		},
+	},
 }
+
+
+
+
+
+require('telescope').load_extension('fzf')
 
 require('nvim-treesitter').setup{}
 
 
---require('lspconfig').serve_d.setup{on_attach=on_attach}
+require('lspconfig').serve_d.setup{on_attach=on_attach}
 
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
@@ -221,7 +254,11 @@ elseif vim.fn.has("win32") == 1 then --??
 else 
 	omnisharp_bin = "ERROR"
 end
-require('lspconfig').omnisharp.setup{ cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) }; }
+require('lspconfig').omnisharp.setup{ 
+	cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) },
+	filetypes = { "cs", "csx" },
+	root_dir = function(fname) return "/Users/nicke" end, --this obviously needs fixing
+}
 
 ------- lua ---------
 local sumneko_root_path = vim.fn.getenv("HOME").."/Downloads/lua-language-server" -- Change to your sumneko root installation
@@ -272,7 +309,7 @@ require('compe').setup {
 	autocomplete = true,
 	debug = false,
 	min_length = 1,
-	preselect = 'enable',
+	preselect = 'disable',
 	throttle_time = 80,
 	source_timeout = 200,
 	incomplete_delay = 400,
@@ -289,7 +326,7 @@ require('compe').setup {
 		buffer = false,
 		spell = false,
 		tags = false,
-		omni = true, --{ priority = 10, menu = "omni"}
+		omni = false, --{ priority = 10, menu = "omni"},
 		--treesitter = { priority = 200, menu ="tree" },
 	},
 }
