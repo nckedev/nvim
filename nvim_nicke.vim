@@ -14,7 +14,7 @@ call plug#begin()
 	Plug 'mfussenegger/nvim-dap'
 	Plug 'rcarriga/nvim-dap-ui'
 
-	Plug 'nvim-lua/popup.nvim'
+		Plug 'nvim-lua/popup.nvim'
 	Plug 'nvim-lua/plenary.nvim'
 	Plug 'nvim-telescope/telescope.nvim'
 	Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
@@ -65,7 +65,6 @@ set completeopt=menuone,noinsert
 set guifont=SauceCodePro\ NF:h15
 let g:neovide_iso_layout = v:true
 let g:neovide_cursor_vfx_mode = "railgun"
-=======
 autocmd BufRead,BufNewFile *.csx set filetype=cs
 
 luafile ~/.config/nvim/debugger.lua
@@ -168,12 +167,14 @@ ca WQ wq
 hi TelescopeMatching guifg=lightgreen
 
 "GRAY NORD THEME
+if has('mac')
  hi Normal guibg=none guifg=LightGray
  hi LineNr guifg=gray
  hi Comment guifg=gray
  hi SignColumn guibg=none
  hi cursorline guibg= gray22
  hi VertSplit guibg=gray22
+ endif
 "
 "remove bgcolor for some themes
 "hi Normal guibg=None
