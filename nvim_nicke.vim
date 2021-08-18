@@ -51,6 +51,10 @@ set fillchars+=vert:.
 
 set completeopt=menuone,noinsert
 
+"for neovide
+set guifont=SauceCodePro\ NF:h15
+let g:neovide_iso_layout = v:true
+let g:neovide_cursor_vfx_mode = "railgun"
 
 let g:EasyMotion_do_mapping = 0
 let g:mapleader = "\<Space>"
@@ -94,7 +98,13 @@ autocmd FileType cs nmap <silent> <buffer> <leader>gd <Plug>(omnisharp_go_to_def
 nnoremap Q q
 nnoremap q <cmd>Telescope builtin theme=get_ivy previewer=false <cr>
 
-nmap <f7> :source ~/.config/nvim/init.vim<cr>
+if has('mac')
+	nmap <f7> :source ~/.config/nvim/init.vim<cr>
+endif
+if has('win32')
+	nmap <f7> :source C:\Users\nmk41\AppData\Local\nvim\init.vim<cr>
+endif
+
 inoremap <c-f> (
 inoremap <c-j> )
 inoremap <c-g> [
