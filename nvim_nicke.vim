@@ -1,5 +1,5 @@
 call plug#begin()
-	Plug 'nckedev/ctrlf'
+	Plug 'nckedev/ctrlf' 
 
 	Plug 'airblade/vim-gitgutter'
 	Plug 'tpope/vim-commentary'
@@ -16,7 +16,7 @@ call plug#begin()
 	Plug 'mfussenegger/nvim-dap'
 	Plug 'rcarriga/nvim-dap-ui'
 
-		Plug 'nvim-lua/popup.nvim'
+	Plug 'nvim-lua/popup.nvim'
 	Plug 'nvim-lua/plenary.nvim'
 	Plug 'nvim-telescope/telescope.nvim'
 	Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
@@ -28,6 +28,7 @@ call plug#begin()
 	Plug 'nanotech/jellybeans.vim'
 	Plug 'morhetz/gruvbox'
 	Plug 'chriskempson/base16-vim'
+	Plug 'sunjon/shade.nvim'
 
 	Plug 'easymotion/vim-easymotion'
 	"Plug 'ggandor/lightspeed.nvim'
@@ -61,7 +62,7 @@ set smarttab
 set splitbelow splitright
 set fillchars+=vert:.
 
-set completeopt=menuone,noinsert
+set completeopt=menuone,noinsert,noselect
 
 "for neovide
 set guifont=SauceCodePro\ NF:h15
@@ -69,7 +70,6 @@ let g:neovide_iso_layout = v:true
 let g:neovide_cursor_vfx_mode = "railgun"
 autocmd BufRead,BufNewFile *.csx set filetype=cs
 
-luafile ~/.config/nvim/debugger.lua
 
 let g:EasyMotion_do_mapping = 0
 let g:mapleader = "\<Space>"
@@ -110,6 +110,8 @@ autocmd FileType cs nmap <f5> :!dotnet script %<cr>
 
 nnoremap <c-f> <cmd>Ctrlf<cr>
 nnoremap <c-space> <cmd>CtrlfNext<cr>
+nnoremap <c-l> <cmd>wincmd w<cr>
+nnoremap <c-h> <cmd>wincmd W<cr>
 
 nnoremap Q q
 nnoremap q <cmd>Telescope builtin theme=get_ivy previewer=false <cr>
@@ -137,7 +139,6 @@ inoremap <s-bs> <esc>diwi
 
 vnoremap r :s/<c-r><c-w>/<left><left>
 
-nmap <f7> :source ~/.config/nvim/nvim_nicke.vim<cr>
 nmap <f8> :e ~/.config/nvim/nvim_nicke.vim<cr>
 inoremap <c-f> (
 inoremap <c-j> )
@@ -153,8 +154,8 @@ onoremap <c-h> ]
 onoremap <c-d> {
 onoremap <c-k> }
 
-nmap <c-left> <cmd>vertical resize -3<CR>
-nnoremap <silent> <C-Right> :vertical resize +3<CR>
+nmap <c-left> <cmd>vertical resize +3<CR>
+nnoremap <silent> <C-Right> :vertical resize -3<CR>
 noremap <silent> <C-Up> :resize +3<CR>
 noremap <silent> <C-Down> :resize -3<CR>
 
@@ -203,7 +204,18 @@ let g:ale_sign_priority = 30
 "========== GitGutter ==================
 let g:git_gutter_sign_priority = 9
 
+
+luafile ~/.config/nvim/compe_config.lua
+luafile ~/.config/nvim/omnisharp.lua
+luafile ~/.config/nvim/debugger.lua
+
 lua << EOF
+
+require('shade').setup({
+	overlay_opacity = 50,
+	opacity_step = 1,
+})
+
 require('lspsaga').init_lsp_saga {
 	use_saga_diagnostic_sign = true,
 	code_action_prompt = {
@@ -242,11 +254,7 @@ extensions = {
 	},
 }
 
-
-
-
-
-require('telescope').load_extension('fzf')
+--require('telescope').load_extension('fzf')
 
 require('nvim-treesitter').setup{}
 
@@ -264,21 +272,6 @@ vim.lsp.diagnostic.on_publish_diagnostics, {
 ------- Python --------
 require('lspconfig').pyright.setup{on_attach=on_attach}
 
-------- C# ----------
-local pid = vim.fn.getpid()
-local omnisharp_bin = ""
-if vim.fn.has("mac") == 1 then
-	omnisharp_bin = "/Users/nicke/.cache/omnisharp-vim/omnisharp-roslyn/run"
-elseif vim.fn.has("win32") == 1 then --??
-	omnisharp_bin = "c:/Users/nmk41/AppData/Local/omnisharp-vim/omnisharp-roslyn/OmniSharp.exe"
-else 
-	omnisharp_bin = "ERROR"
-end
-require('lspconfig').omnisharp.setup{ 
-	cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) },
-	filetypes = { "cs", "csx" },
-	root_dir = function(fname) return "/Users/nicke" end, --this obviously needs fixing
-}
 
 ------- lua ---------
 local sumneko_root_path = vim.fn.getenv("HOME").."/Downloads/lua-language-server" -- Change to your sumneko root installation
@@ -323,72 +316,6 @@ require('lspconfig').sumneko_lua.setup {
 		},
 	},
 }
-------- Compe setup -------------
-require('compe').setup {
-	enabled = true,
-	autocomplete = true,
-	debug = false,
-	min_length = 1,
-	preselect = 'disable',
-	throttle_time = 80,
-	source_timeout = 200,
-	incomplete_delay = 400,
-	max_abbr_width = 100,
-	max_kind_width = 100,
-	max_menu_width = 100,
-	documentation = true,
-
-	source = {
-		path = true,
-		nvim_lsp = true, -- { priority = 110, menu = "lsp" },
-		nvim_lua = false, --{ priority = 200, menu = "lualsp" },
-		calc = true,
-		buffer = false,
-		spell = false,
-		tags = false,
-		omni = false, --{ priority = 10, menu = "omni"},
-		--treesitter = { priority = 200, menu ="tree" },
-	},
-}
-
-local t = function(str)
-	return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
-
-local check_back_space = function()
-	local col = vim.fn.col('.') - 1
-	if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
-		return true
-	else
-		return false
-	end
-end
-
--- Use (s-)tab to:
---- move to prev/next item in completion menuone
---- jump to prev/next snippet's placeholder
-_G.tab_complete = function()
-	if vim.fn.pumvisible() == 1 then
-		return t "<C-n>"
-	elseif check_back_space() then
-		return t "<Tab>"
-	else
-		return vim.fn['compe#complete']()
-	end
-end
-_G.s_tab_complete = function()
-	if vim.fn.pumvisible() == 1 then
-		return t "<C-p>"
-	else
-		return t "<S-Tab>"
-	end
-end
-
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-
 EOF
 
 lua << EOF
@@ -399,14 +326,14 @@ end
 function test_handler(err, method, result, client_id, bufnr, config)
 	print("test handleer")
 	items = vim.lsp.util.text_document_completion_list_to_complete_items(result, "")
-	print("err", vim.inspect(err))
-	print("method", vim.inspect(method))
-	print("result", vim.inspect(result))
-	print("client_id", vim.inspect(client_id))
-	print("bufnr", vim.inspect(bufnr))
-	print("config", vim.inspect(config))
+	print("items", vim.inspect(items))
+	--print("err", vim.inspect(err))
+	-- print("method", vim.inspect(method))
+	-- print("result", vim.inspect(result))
+	-- print("client_id", vim.inspect(client_id))
+	--print("bufnr", vim.inspect(bufnr))
+	-- print("config", vim.inspect(config))
 end
 
 EOF
 imap <c-space> <cmd> lua test()<cr>
-nmap <c-ö> <cmd> lua test()<cr>
