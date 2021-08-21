@@ -22,7 +22,7 @@ require('compe').setup {
 		buffer = false,
 		spell = false,
 		tags = false,
-		omni = true, --{ priority = 10, menu = "omni"},
+		omni = false, --{ priority = 10, menu = "omni"},
 		--treesitter = { priority = 200, menu ="tree" },
 	},
 }

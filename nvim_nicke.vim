@@ -1,6 +1,6 @@
 call plug#begin()
 	Plug 'nckedev/ctrlf' 
-
+	Plug 'dart-lang/dart-vim-plugin'
 	Plug 'airblade/vim-gitgutter'
 	Plug 'tpope/vim-commentary'
 	Plug 'tpope/vim-fugitive'
@@ -24,15 +24,18 @@ call plug#begin()
 	Plug 'kyazdani42/nvim-web-devicons'
 	Plug 'nvim-treesitter/nvim-treesitter', {'do': 'TSUpdate'}
 	Plug 'nvim-treesitter/playground'
+	
+	"themes
 	Plug 'arcticicestudio/nord-vim'
 	Plug 'nanotech/jellybeans.vim'
 	Plug 'morhetz/gruvbox'
 	Plug 'chriskempson/base16-vim'
+
 	Plug 'sunjon/shade.nvim'
 
-	Plug 'easymotion/vim-easymotion'
+	"Plug 'easymotion/vim-easymotion'
 	"Plug 'ggandor/lightspeed.nvim'
-	Plug 'phaazon/hop.nvim'
+	"Plug 'phaazon/hop.nvim'
 
 	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 	Plug 'junegunn/fzf.vim'
@@ -41,7 +44,8 @@ call plug#begin()
 call plug#end()
 
 color nord
-language en_US
+language message en_US
+language ctype sv_SE
 syntax on
 filetype plugin indent on
 set autochdir
@@ -64,10 +68,14 @@ set fillchars+=vert:.
 
 set completeopt=menuone,noinsert,noselect
 
-"for neovide
-set guifont=SauceCodePro\ NF:h15
-let g:neovide_iso_layout = v:true
-let g:neovide_cursor_vfx_mode = "railgun"
+"for neovide{
+if exists('g:neovide')
+	set guifont=SauceCodePro\ NF:h15
+	let g:neovide_iso_layout = v:true
+	let g:neovide_cursor_vfx_mode = "railgun"
+	let g:neovide_input_use_logo= v:true
+
+endif
 autocmd BufRead,BufNewFile *.csx set filetype=cs
 
 
@@ -108,8 +116,18 @@ autocmd FileType cs nmap <silent> <buffer> <leader>h <Plug>(omnisharp_signature_
 autocmd FileType cs nmap <silent> <buffer> <leader>gd <Plug>(omnisharp_go_to_defenition)
 autocmd FileType cs nmap <f5> :!dotnet script %<cr>
 
+autocmd FileType python nmap <f5> :!python %<cr>
+
+map s <cmd>Ctrlf<cr>
+map ä <cmd>Ctrlf<cr>
 nnoremap <c-f> <cmd>Ctrlf<cr>
-nnoremap <c-space> <cmd>CtrlfNext<cr>
+noremap <leader>j <cmd>Ctrlf<cr>
+noremap <c-space> <cmd>CtrlfNext<cr>
+
+nnoremap <leader>y "*y
+nnoremap <leader>Y "*Y
+nnoremap <leader>p "*p
+nnoremap <leader>P "*P
 nnoremap <c-l> <cmd>wincmd w<cr>
 nnoremap <c-h> <cmd>wincmd W<cr>
 
@@ -119,7 +137,7 @@ nnoremap q <cmd>Telescope builtin theme=get_ivy previewer=false <cr>
 if has('mac')
 	nmap <f7> :source ~/.config/nvim/init.vim<cr>
 endif
-if has('win32')
+if has('win64')
 	nmap <f7> :source C:\Users\nmk41\AppData\Local\nvim\init.vim<cr>
 endif
 
@@ -193,11 +211,12 @@ highlight PmenuSel ctermbg=white ctermfg=black
 highlight MatchParen ctermbg=darkgray ctermfg=white
 
 "========= ALE SETTINGS ================
-let g:ale_linters = {'cs': ['OmniSharp']}
+let g:ale_linters = {'cs': ['OmniSharp'], 'py' : ['pylint']}
 let g:ale_sign_gutter_column_always = 1
 let g:ale_sign_error = ''
 let g:ale_sign_warning = ''
 let g:ale_sign_priority = 30
+let g:ale_python_pylint_options='disable=missing-function-docstring'
 "hi clear ALEErrorSign
 "hi clear ALEWarnSign
 
@@ -253,11 +272,23 @@ extensions = {
 		},
 	},
 }
-
 --require('telescope').load_extension('fzf')
 
 require('nvim-treesitter').setup{}
 
+local dart_dir = ""
+if vim.fn.has('win32') == 1 then
+	dart_dir = "C:\\Users\\nmk41\\scoop\\apps\\dart\\current\\bin\\dart.exe"
+elseif vim.fn.has('mac') == 1 then
+	dart_dir = ""
+end
+
+
+require('lspconfig').dartls.setup{}
+--require('lspconfig').dartls.setup{ cmd = { 'dart', 'C:\\Users\\nmk41\\scoop\\apps\\dart\\current\\bin\\snapshots\\analysis_server.dart.snapshot', '--lsp' } }
+
+--	root_dir = "C:\\Users\\nmk41",
+--}
 
 require('lspconfig').serve_d.setup{on_attach=on_attach}
 
@@ -326,6 +357,7 @@ end
 function test_handler(err, method, result, client_id, bufnr, config)
 	print("test handleer")
 	items = vim.lsp.util.text_document_completion_list_to_complete_items(result, "")
+--	vim.lsp.util.extract_completion_items(result)
 	print("items", vim.inspect(items))
 	--print("err", vim.inspect(err))
 	-- print("method", vim.inspect(method))
