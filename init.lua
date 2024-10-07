@@ -250,12 +250,13 @@ function map_find_keys(l, r)
 end
 
 local scope = { "i", "o", "l" }
-vim.keymap.set(scope, "<C-d>", "{")
-vim.keymap.set(scope, "<C-k>", "}")
-vim.keymap.set(scope, "<C-f>", "(")
-vim.keymap.set(scope, "<C-j>", ")")
-vim.keymap.set(scope, "<C-g>", "[")
-vim.keymap.set(scope, "<C-h>", "]")
+-- remap to work with auto pairs
+vim.keymap.set(scope, "<C-d>", "{", { remap = true })
+vim.keymap.set(scope, "<C-k>", "}", { remap = true })
+vim.keymap.set(scope, "<C-f>", "(", { remap = true })
+vim.keymap.set(scope, "<C-j>", ")", { remap = true })
+vim.keymap.set(scope, "<C-g>", "[", { remap = true })
+vim.keymap.set(scope, "<C-h>", "]", { remap = true })
 vim.keymap.set(scope, "<D-n>", "_")
 vim.keymap.set(scope, "<D-m>", ":")
 vim.keymap.set(scope, "<D-,>", "_")
@@ -974,14 +975,13 @@ require("lazy").setup({
 		end,
 	},
 
-
-{
-    'windwp/nvim-autopairs',
-    event = "InsertEnter",
-    config = true
-    -- use opts = {} for passing setup options
-    -- this is equivalent to setup({}) function
-},
+	{
+		"windwp/nvim-autopairs",
+		event = "InsertEnter",
+		config = true,
+		-- use opts = {} for passing setup options
+		-- this is equivalent to setup({}) function
+	},
 
 	-- Highlight todo, notes, etc in comments
 	{
