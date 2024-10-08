@@ -214,6 +214,9 @@ if vim.g.neovide and vim.uv.cwd() == "/" then
 	vim.cmd("cd ~")
 end
 
+-- for pasting from ai
+vim.keymap.set("n", "<D-v>", "p")
+
 vim.keymap.set("n", "<leader>6", ":w<cr>:color patana<cr>")
 vim.keymap.set("n", "<leader>5", ":Inspect<cr>")
 vim.keymap.set("n", "<leader>w", ":wa<cr>")
