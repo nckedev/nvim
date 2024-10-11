@@ -200,7 +200,7 @@ vim.g.neovide_light_radius = 5
 vim.g.neovide_position_animation_lenght = 0
 vim.g.neovide_cursor_animate_command_line = false
 vim.g.experimental_layer_grouping = false
-vim.g.neovide_input_macos_option_key_is_meta = true
+vim.g.neovide_input_macos_option_key_is_meta = "only_left"
 
 -- monaspace or monaspice? nerdfont
 -- vim.opt.guifont = "Liga SFMono Nerd Font:h15"
@@ -220,7 +220,7 @@ vim.keymap.set("n", "<D-v>", "p")
 vim.keymap.set("n", "<leader>6", ":w<cr>:color patana<cr>")
 vim.keymap.set("n", "<leader>5", ":Inspect<cr>")
 vim.keymap.set("n", "<leader>w", ":wa<cr>")
---
+
 -- TODO: for rust only
 vim.cmd("iab derive #[derive()]<left><left>")
 vim.cmd("iab @@ #[]<left>")
@@ -228,10 +228,11 @@ vim.keymap.set("n", "<leader>bt", ":!cargo test 2>/dev/null<cr>", { desc = "carg
 vim.keymap.set("n", "<leader>bb", ":!cargo build", { desc = "build" })
 vim.keymap.set("n", "<leader>br", ":!cargo run", { desc = "run" })
 
-vim.keymap.set("n", "<D-J>", ":m .+1<CR>==", { silent = true })
-vim.keymap.set("n", "<D-K>", ":m .-2<CR>==", { silent = true })
-vim.keymap.set("v", "<D-J>", ":m '>+1<CR>gv=gv", { silent = true })
-vim.keymap.set("v", "<D-J>", ":m '<-2<CR>gv=gv", { silent = true })
+-- opt + j or k
+vim.keymap.set("n", "<M-J>", ":m .+1<CR>==", { silent = true })
+vim.keymap.set("n", "<M-K>", ":m .-2<CR>==", { silent = true })
+vim.keymap.set("v", "<M-J>", ":m '>+1<CR>gv=gv", { silent = true })
+vim.keymap.set("v", "<M-K>", ":m '<-2<CR>gv=gv", { silent = true })
 
 vim.keymap.set({ "n", "x", "o" }, "<leader><leader>f", "<cmd>Ctrlf<CR>")
 vim.keymap.set("n", "<leader>ä", "<cmd>CtrlfNex<CR>")
@@ -243,7 +244,7 @@ vim.keymap.set("n", "<C-k>", "<C-u>")
 vim.keymap.set("n", "<leader>t", vim.lsp.buf.format, { desc = "format" })
 vim.keymap.set("i", "<c-0>", vim.lsp.buf.signature_help)
 
-vim.keymap.set("n", "<leader>k", "gcc")
+vim.keymap.set("n", "<leader>k", "gcc", { remap = true })
 vim.keymap.set("v", "<leader>k", "gc")
 
 function map_find_keys(l, r)
