@@ -179,6 +179,18 @@ require("lspconfig").rust_analyzer.setup({
 		},
 	},
 })
+
+require("lspconfig").csharp_ls.setup({
+	cmd = { "csharp-ls" },
+	root_dir = function(fname)
+		return util.root_pattern("*.sln")(fname) or util.root_pattern("*.csproj")(fname)
+	end,
+	filetypes = { "cs" },
+	init_options = {
+		AutomaticWorkspaceInit = true,
+	},
+})
+
 vim.diagnostic.config({
 	virtual_text = false,
 	severity_sort = true,
@@ -234,7 +246,8 @@ vim.keymap.set("n", "<M-K>", ":m .-2<CR>==", { silent = true })
 vim.keymap.set("v", "<M-J>", ":m '>+1<CR>gv=gv", { silent = true })
 vim.keymap.set("v", "<M-K>", ":m '<-2<CR>gv=gv", { silent = true })
 
-vim.keymap.set({ "n", "x", "o" }, "<leader><leader>f", "<cmd>Ctrlf<CR>")
+vim.keymap.set({ "n", "x", "o" }, "<leader><leader>", "<cmd>Ctrlf<CR>")
+vim.keymap.set({ "n", "x", "o" }, "<C-f>", "<cmd>Ctrlf<CR>")
 vim.keymap.set("n", "<leader>ä", "<cmd>CtrlfNex<CR>")
 
 vim.keymap.set({ "n", "o", "v" }, "q", "b")
@@ -245,7 +258,7 @@ vim.keymap.set("n", "<leader>t", vim.lsp.buf.format, { desc = "format" })
 vim.keymap.set("i", "<c-0>", vim.lsp.buf.signature_help)
 
 vim.keymap.set("n", "<leader>k", "gcc", { remap = true })
-vim.keymap.set("v", "<leader>k", "gc")
+vim.keymap.set("v", "<leader>k", "gc", { remap = true })
 
 function map_find_keys(l, r)
 	for _, v in ipairs({ "f", "F", "t", "T" }) do
@@ -414,7 +427,7 @@ require("lazy").setup({
 				["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
 				["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
 				["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-				["<leader>f"] = { name = "[F]earch", _ = "which_key_ignore" },
+				["<leader>f"] = { name = "Find", _ = "which_key_ignore" },
 				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
 			})
 		end,
@@ -506,9 +519,10 @@ require("lazy").setup({
 				},
 				pickers = {
 					lsp_document_symbols = {
-						previewer = true,
+						previewer = false,
 						layout_config = {
 							height = 0.4,
+							widht = 0.2,
 						},
 						-- entry_maker = function(entry)
 						-- 	local bufnr = vim.api.nvim_get_current_buf()
@@ -543,14 +557,18 @@ require("lazy").setup({
 
 			-- See `:help telescope.builtin`
 			local builtin = require("telescope.builtin")
+			vim.keymap.set("n", "<leader>ft", ":TodoTelescope<cr>", { desc = "Find TODOs NOTEs etc" })
+			vim.keymap.set("n", "<leader>fq", builtin.quickfix, { desc = "Find within qf" })
 			vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Find help tags" })
 			vim.keymap.set("n", "<leader>fo", builtin.oldfiles, { desc = "Find old files" })
 			vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
 			vim.keymap.set("n", "<leader>fb", builtin.builtin, { desc = "Find telescope builtin" })
 			vim.keymap.set("n", "<leader>fc", builtin.grep_string, { desc = "Find current word" })
-			vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Find with Grep" })
+			vim.keymap.set("n", "<leader>fg", function()
+				builtin.live_grep({ grep_open_files = true })
+			end, { desc = "Find with Grep" })
 			vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Find diagnostics" })
-			vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
+			vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "Resume last search" })
 			vim.keymap.set("n", "<c-space>", function()
 				builtin.buffers({ sort_lastused = true, ignore_current_buffer = true })
 			end, { desc = "[ ] Find existing buffers" })
@@ -561,15 +579,6 @@ require("lazy").setup({
 				builtin.current_buffer_fuzzy_find,
 				{ desc = "Fuzzily search in current buffer" }
 			)
-
-			-- Also possible to pass additional configuration options.
-			--  See `:help telescope.builtin.live_grep()` for information about particular keys
-			vim.keymap.set("n", "<leader>s/", function()
-				builtin.live_grep({
-					grep_open_files = true,
-					prompt_title = "Live Grep in Open Files",
-				})
-			end, { desc = "[S]earch [/] in Open Files" })
 
 			-- Shortcut for searching your neovim configuration files
 			vim.keymap.set("n", "<leader>fn", function()
@@ -652,7 +661,7 @@ require("lazy").setup({
 
 					-- Fuzzy find all the symbols in your current document.
 					--  Symbols are things like variables, functions, types, etc.
-					map("<leader>fs", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+					map("<leader>fs", require("telescope.builtin").lsp_document_symbols, "Find document symbols")
 
 					-- Fuzzy find all the symbols in your current workspace
 					--  Similar to document symbols, except searches over your whole project.
@@ -664,7 +673,7 @@ require("lazy").setup({
 
 					-- Rename the variable under your cursor
 					--  Most Language Servers support renaming across files, etc.
-					map("<leader>rr", vim.lsp.buf.rename, "[rr]ename")
+					map("<leader>rr", vim.lsp.buf.rename, "Rename")
 
 					-- Execute a code action, usually your cursor needs to be on top of an error
 					-- or a suggestion from your LSP for this to activate.
@@ -672,7 +681,7 @@ require("lazy").setup({
 
 					-- Opens a popup that displays documentation about the word under your cursor
 					--  See `:help K` for why this keymap
-					map("<leader>hh", vim.lsp.buf.hover, "Hover Documentation")
+					map("<leader>h", vim.lsp.buf.hover, "Hover Documentation")
 
 					-- WARN: This is not Goto Definition, this is Goto Declaration.
 					--  For example, in C this would take you to the header
@@ -726,11 +735,11 @@ require("lazy").setup({
 				-- But for many setups, the LSP (`tsserver`) will work just fine
 				-- tsserver = {},
 				--
-				omnisharp = {
-					capabilities = capabilities,
-					enable_import_completion = true,
-					filetypes = { "cs", "csproj", "sln", "slnx", "props", "csx", "targets" },
-				},
+				-- omnisharp = {
+				-- 	capabilities = capabilities,
+				-- 	enable_import_completion = true,
+				-- 	filetypes = { "cs", "csproj", "sln", "slnx", "props", "csx", "targets" },
+				-- },
 				lua_ls = {
 					-- cmd = {...},
 					-- filetypes { ...},
@@ -775,7 +784,7 @@ require("lazy").setup({
 			vim.list_extend(ensure_installed, {
 				"stylua", -- Used to format lua code
 			})
-			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+			-- require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 			require("mason-lspconfig").setup({
 				handlers = {
