@@ -229,7 +229,7 @@ end
 -- for pasting from ai
 vim.keymap.set("n", "<D-v>", "p")
 
-vim.keymap.set("n", "<leader>6", ":w<cr>:color patana<cr>")
+vim.keymap.set("n", "<leader>6", ":w<cr>:color gray-base<cr>")
 vim.keymap.set("n", "<leader>5", ":Inspect<cr>")
 vim.keymap.set("n", "<leader>w", ":wa<cr>")
 
@@ -1086,6 +1086,10 @@ require("lazy").setup({
 		--- opts = {},
 	},
 	{
+		"nckedev/gray-base.nvim",
+		--- opts = {},
+	},
+	{
 		"stevearc/oil.nvim",
 		opts = {
 			height = 100,
@@ -1193,6 +1197,6 @@ require("lazy").setup({
 	},
 })
 
-vim.cmd.colorscheme("patana")
+vim.cmd.colorscheme("gray-base")
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
