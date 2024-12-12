@@ -1,6 +1,6 @@
 local M = {}
 local commands = {
-	["rs"] = {
+	["rust"] = {
 		build = "cargo build",
 		test = "cargo test test 2>/dev/null",
 		run = "cargo run",
@@ -14,7 +14,6 @@ local commands = {
 
 local function get_ft()
 	local ft = vim.filetype.match({ buf = 0 })
-	vim.print(ft)
 	if ft == nil then
 		return "no ft"
 	end
@@ -22,9 +21,8 @@ local function get_ft()
 end
 
 local function get_command(type)
-	vim.print(commands["cs"])
 	local ft = get_ft()
-	if ft == "no ft" then
+	if commands[ft] == nil then
 		local msg = "finns inga build commandon för " .. ft
 		return 'echo "' .. msg .. '"'
 	else
@@ -42,12 +40,17 @@ local function get_command(type)
 end
 
 function M.build()
+	vim.cmd(":wa")
 	vim.cmd(get_command("build"))
 end
+
 function M.test()
+	vim.cmd(":wa")
 	vim.cmd(get_command("test"))
 end
+
 function M.run()
+	vim.cmd(":wa")
 	vim.cmd(get_command("run"))
 end
 

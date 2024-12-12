@@ -35,6 +35,7 @@ vim.opt.smartcase = true
 -- Keep signcolumn on by default
 vim.opt.signcolumn = "yes"
 
+
 -- Decrease update time
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
@@ -66,7 +67,6 @@ vim.opt.scrolloff = 10
 -- neotest
 -- csharp
 -- neoclip
--- ctrlf
 -- flytta rad/selection upp och ner a-s-j, a-s-k
 
 vim.opt.guicursor = "n-v:block-Cursor,i-ci-cr:ver20-Cursor,i-ci-cr:ver20-Cursor"
@@ -501,6 +501,9 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fn", function()
         builtin.find_files({ cwd = vim.fn.stdpath("config") })
       end, { desc = "[F]ind [N]eovim files" })
+      vim.keymap.set("n", "<leader>fp", function()
+        builtin.find_files({ cwd = vim.fn.stdpath("data") .. "/lazy" })
+      end, { desc = "Find Pluginfiles" })
     end,
   },
 
@@ -511,6 +514,16 @@ require("lazy").setup({
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "WhoIsSethDaniel/mason-tool-installer.nvim",
+      {
+        "folke/lazydev.nvim",
+        ft = "lua",
+        opts = {
+          library = {
+            { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+          },
+        },
+      },
+
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -643,7 +656,7 @@ require("lazy").setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
+        gopls = {},
         -- pyright = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -663,29 +676,29 @@ require("lazy").setup({
           -- cmd = {...},
           -- filetypes { ...},
           -- capabilities = {},
-          settings = {
-            Lua = {
-              runtime = { version = "LuaJIT" },
-              workspace = {
-                maxPreload = 10000,
-                preloadFileSize = 1000,
-                checkThirdParty = false,
-                -- Tells lua_ls where to find all the Lua files that you have loaded
-                -- for your neovim configuration.
-                -- library = {
-                --   "${3rd}/luv/library",
-                --   unpack(vim.api.nvim_get_runtime_file("", true)),
-                -- },
-                -- If lua_ls is really slow on your computer, you can try this instead:
-                library = { vim.env.VIMRUNTIME },
-              },
-              completion = {
-                callSnippet = "Replace",
-              },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
-            },
-          },
+          -- settings = {
+          --   Lua = {
+          --     runtime = { version = "LuaJIT" },
+          --     workspace = {
+          --       maxPreload = 10000,
+          --       preloadFileSize = 1000,
+          --       checkThirdParty = false,
+          --       -- Tells lua_ls where to find all the Lua files that you have loaded
+          --       -- for your neovim configuration.
+          --       -- library = {
+          --       --   "${3rd}/luv/library",
+          --       --   unpack(vim.api.nvim_get_runtime_file("", true)),
+          --       -- },
+          --       -- If lua_ls is really slow on your computer, you can try this instead:
+          --       -- library = { vim.env.VIMRUNTIME },
+          --     },
+          --     completion = {
+          --       callSnippet = "Replace",
+          --     },
+          --     -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+          --     -- diagnostics = { disable = { 'missing-fields' } },
+          --   },
+          -- },
         },
       }
 
@@ -1011,9 +1024,6 @@ require("lazy").setup({
     "nckedev/gray-base.nvim",
     opts = {
       use_colored_strings = false,
-      dark = {
-        colors = {},
-      },
       light = {
         tint = {
           hue = 35,
@@ -1042,6 +1052,13 @@ require("lazy").setup({
   },
   {
     "nckedev/ctrlf",
+    opts = {
+      colors = {
+        hint_char = { fg = "#FFFFFF", bg = "#000FF0" },
+        match = { fg = "#FFFFFF", bg = "#000FF0" },
+        match_closest = { fg = "#FFFFFF", bg = "#000FF0" },
+      }
+    }
   },
   {
     "fcancelinha/northern.nvim",
