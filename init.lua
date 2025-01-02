@@ -8,6 +8,7 @@ vim.g.maplocalleader = " "
 -- Set to true if you have a Nerd Font installed
 vim.g.have_nerd_font = true
 
+vim.opt.expandtab = true
 -- Make line numbers default
 vim.opt.number = true
 
@@ -452,6 +453,7 @@ require("lazy").setup({
             -- end,
           },
           find_files = {
+            find_commmand = { "rg", "--no-config", "--files", "--sortr=modified" },
             previewer = false,
             layout_config = {
               height = 0.4,
@@ -1038,6 +1040,7 @@ require("lazy").setup({
       },
     },
   },
+  require('fzf'),
   {
     "stevearc/oil.nvim",
     opts = {
@@ -1053,6 +1056,7 @@ require("lazy").setup({
   {
     "nckedev/ctrlf",
     opts = {
+      searchbox = "cursor_after",
       colors = {
         hint_char = { fg = "#FFFFFF", bg = "#000FF0" },
         match = { fg = "#FFFFFF", bg = "#000FF0" },
