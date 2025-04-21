@@ -1,6 +1,6 @@
+--ini
 --
---
-
+vim.opt.title = true
 -- vim.opt.background = "light"
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -117,6 +117,7 @@ vim.diagnostic.config({
   },
 })
 
+
 -- funkar inte ?
 vim.g.neovide_floating_shadow = false
 vim.g.neovide_floating_z_height = 10
@@ -128,8 +129,12 @@ vim.g.experimental_layer_grouping = false
 vim.g.neovide_input_macos_option_key_is_meta = "only_left"
 
 -- monaspace or monaspice? nerdfont
+-- roboto mono
+-- DejaVuSansMono Nerd Font Mono
 -- vim.opt.guifont = "Liga SFMono Nerd Font:h15"
+-- vim.opt.guifont = "RobotoMono_Nerd_Font_Mono:h16"
 vim.opt.guifont = "JetBrainsMono_Nerd_Font:h15"
+vim.opt.linespace = 1
 vim.opt.pumheight = 12
 vim.opt.pumwidth = 20
 vim.o.ts = 4
@@ -151,6 +156,7 @@ vim.keymap.set("n", "<leader>w", ":wa<cr>")
 -- TODO: for rust only
 vim.cmd("iab derive #[derive()]<left><left>")
 vim.cmd("iab @@ #[]<left>")
+
 
 local runner = require("build")
 vim.keymap.set("n", "<leader>bt", runner.test, { desc = "Test" })
@@ -283,6 +289,11 @@ require("lazy").setup({
   -- "gc" to comment visual regions/lines
   { "numToStr/Comment.nvim", opts = {} },
 
+  -- Code comapnion AI tools
+  require("codecomp"),
+
+  require("_snacks"),
+
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following lua:
   --    require('gitsigns').setup({ ... })
@@ -330,7 +341,7 @@ require("lazy").setup({
     "folke/which-key.nvim",
     event = "VimEnter", -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
-      require("which-key").setup()
+      require("which-key").setup({ delay = 500 })
 
       -- Document existing key chains
       require("which-key").register({
@@ -411,7 +422,7 @@ require("lazy").setup({
         --  All the info you're looking for is in `:help telescope.setup()`
         --
         defaults = {
-          file_ignore_patterns = { "node_modules/" },
+          file_ignore_patterns = { "node_modules/", "bin/", "obj/" },
           borderchars = { " ", " ", " ", " ", " ", " ", " ", " " },
           mappings = {
             i = {
@@ -477,8 +488,8 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fq", builtin.quickfix, { desc = "Find within qf" })
       vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Find help tags" })
       vim.keymap.set("n", "<leader>fo", builtin.oldfiles, { desc = "Find old files" })
-      vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
-      vim.keymap.set("n", "<leader>fb", builtin.builtin, { desc = "Find telescope builtin" })
+      -- vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
+      -- vim.keymap.set("n", "<leader>fb", builtin.builtin, { desc = "Find telescope builtin" })
       vim.keymap.set("n", "<leader>fc", builtin.grep_string, { desc = "Find current word" })
       vim.keymap.set("n", "<leader>fg", function()
         builtin.live_grep({ grep_open_files = false, disable_coordinates = true })
@@ -492,20 +503,20 @@ require("lazy").setup({
         builtin.buffers({ sort_lastused = true, ignore_current_buffer = true })
       end, { desc = "[ ] Find existing buffers" })
 
-      vim.keymap.set(
-        "n",
-        "<leader>fj",
-        builtin.current_buffer_fuzzy_find,
-        { desc = "Fuzzily search in current buffer" }
-      )
+      -- vim.keymap.set(
+      --   "n",
+      --   "<leader>fj",
+      --   builtin.current_buffer_fuzzy_find,
+      --   { desc = "Fuzzily search in current buffer" }
+      -- )
 
       -- Shortcut for searching your neovim configuration files
       vim.keymap.set("n", "<leader>fn", function()
         builtin.find_files({ cwd = vim.fn.stdpath("config") })
       end, { desc = "[F]ind [N]eovim files" })
-      vim.keymap.set("n", "<leader>fp", function()
-        builtin.find_files({ cwd = vim.fn.stdpath("data") .. "/lazy" })
-      end, { desc = "Find Pluginfiles" })
+      -- vim.keymap.set("n", "<leader>fp", function()
+      --   builtin.find_files({ cwd = vim.fn.stdpath("data") .. "/lazy" })
+      -- end, { desc = "Find Pluginfiles" })
     end,
   },
 
@@ -609,7 +620,7 @@ require("lazy").setup({
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
+          -- map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
           map("<D-cr>", vim.lsp.buf.code_action, "Code Action")
 
           -- Opens a popup that displays documentation about the word under your cursor
@@ -734,8 +745,15 @@ require("lazy").setup({
       })
     end,
   }, -- end of lsp
+  {
+    "GustavEikaas/easy-dotnet.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", 'nvim-telescope/telescope.nvim', },
+    config = function()
+      require("easy-dotnet").setup()
+    end
+  },
 
-  {  -- Autoformat
+  { -- Autoformat
     "stevearc/conform.nvim",
     opts = {
       notify_on_error = false,
@@ -854,11 +872,23 @@ require("lazy").setup({
           --  This will expand snippets if the LSP sent a snippet.
           ["<C-y>"] = cmp.mapping.confirm({ select = true }),
           ["<cr>"] = cmp.mapping.confirm({ select = true }),
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            -- This little snippet will confirm with tab, and if no entry is selected, will confirm the first item
+            if cmp.visible() then
+              local entry = cmp.get_selected_entry()
+              if not entry then
+                cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+              end
+              cmp.confirm()
+            else
+              fallback()
+            end
+          end, { "i", "s", }),
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
-          ["<C-Space>"] = cmp.mapping.complete({}),
+          -- ["<C-Space>"] = cmp.mapping.complete({}),
 
           -- Think of <c-l> as moving to the right of your snippet expansion.
           --  So if you have a snippet that's like:
@@ -931,13 +961,14 @@ require("lazy").setup({
     config = function()
       require("nvim-autopairs").setup({})
       -- If you want to automatically add `(` after selecting a function or method
-      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-      local cmp = require("cmp")
-      cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+      -- local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+      -- local cmp = require("cmp")
+      -- cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
     end,
     -- use opts = {} for passing setup options
     -- this is equivalent to setup({}) function
   },
+
 
   -- Highlight todo, notes, etc in comments
   {
@@ -1025,7 +1056,7 @@ require("lazy").setup({
   {
     "nckedev/gray-base.nvim",
     opts = {
-      use_colored_strings = false,
+      monochrome_strings = false,
       light = {
         tint = {
           hue = 35,
@@ -1073,6 +1104,20 @@ require("lazy").setup({
     priority = 1000,
     config = function()
       require("nordic").load()
+    end,
+  },
+  {
+    "supermaven-inc/supermaven-nvim",
+    config = function()
+      require("supermaven-nvim").setup({
+        keymaps = {
+          accept_suggestion = "<c-7>",
+          accept_word = "<c-y>",
+        },
+        color = {
+          suggestion_color = "#8da9b0",
+        }
+      })
     end,
   },
   {

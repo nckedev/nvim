@@ -1,0 +1,92 @@
+return {
+  "folke/snacks.nvim",
+  priority = 1000,
+  lazy = false,
+
+  config = function()
+    require("snacks").setup(
+      {
+        bigfile = { enabled = false },
+        dashboard = { enabled = false },
+        explorer = { enabled = false },
+        indent = { enabled = false },
+        input = { enabled = false },
+        notifier = { enabled = false },
+        quickfile = { enabled = false },
+        scope = { enabled = false },
+        scroll = { enabled = false },
+        statuscolumn = { enabled = false },
+        words = { enabled = false },
+        lazygit = { configure = true },
+        -- snacks.picker root
+        picker = {
+          win = {
+            input = {
+              keys = {
+                ["<Esc>"] = { "close", mode = { "n", "i" } },
+                ["?"] = "toggle_help_input",
+              }
+            }
+          },
+          prompt = " 󰜴 ",
+          layout = {
+            preset = "test",
+            cycle = false,
+            preview = false,
+          },
+          layouts = {
+            -- I wanted to modify the ivy layout height and preview pane width,
+            -- this is the only way I was able to do it
+            -- NOTE: I don't think this is the right way as I'm declaring all the
+            -- other values below, if you know a better way, let me know
+            --
+            -- Then call this layout in the keymaps above
+            -- got example from here
+            -- https://github.com/folke/snacks.nvim/discussions/468
+            test = {
+              layout = {
+                box = "vertical",
+                backdrop = true,
+                row = -1,
+                width = 0,
+                height = 0.4,
+                border = "top",
+                -- title = "",
+                title = " {title} {live} {flags}",
+                title_pos = "center",
+                { win = "input", height = 1, border = "bottom" },
+                {
+                  box = "horizontal",
+                  { win = "list",    border = "none" },
+                  { win = "preview", title = "{preview}", width = 0.5, border = "left" },
+                },
+              },
+            },
+          },
+          formatters = {
+            selected = {
+              show_always = true, -- only show the selected column when there are multiple selections
+              unselected = true,  -- use the unselected icon for unselected items
+            },
+          },
+
+          ---@class snacks.picker.icons
+          icons = {
+            ui = {
+              selected = "▍ ",
+              unselected = "  ",
+            }
+          }
+        },
+
+
+      })
+
+    vim.keymap.set("n", "<leader>ff", Snacks.picker.files, { desc = "Files" })
+    vim.keymap.set("n", "<leader>fb", Snacks.picker.pickers, { desc = "Pickers" })
+    vim.keymap.set("n", "<leader>fp", Snacks.picker.projects, { desc = "Projects" })
+    vim.keymap.set("n", "<leader>fj", Snacks.picker.lines, { desc = "Buffer lines" })
+  end
+
+  ---@type snacks.Config
+}
