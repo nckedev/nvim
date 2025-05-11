@@ -51,8 +51,8 @@ return {
                 width = 0,
                 height = 0.4,
                 border = "top",
-                -- title = "",
-                title = " {title} {live} {flags}",
+                title = "",
+                -- title = " {title} {live} {flags}",
                 title_pos = "center",
                 { win = "input", height = 1, border = "bottom" },
                 {
@@ -73,10 +73,44 @@ return {
           ---@class snacks.picker.icons
           icons = {
             ui = {
-              selected = "▍ ",
-              unselected = "  ",
+              -- spaces after for some padding
+              selected = "▍  ",
+              unselected = "   ",
+            }
+          },
+          sources = {
+            lsp_symbols = {
+              filter = {
+                rust = {
+                  "Class",
+                  "Constructor",
+                  "Enum",
+                  "Field",
+                  "Function",
+                  "Interface",
+                  "Method",
+                  "Module",
+                  "Namespace",
+                  "Package",
+                  "Property",
+                  "Struct",
+                  "Trait",
+                  -- added from defaults
+                  "Object",
+                  "Constant"
+                }
+              }
+            },
+            files = {
+              exclude = {
+                "target/",
+                "build/",
+                "node_modules/"
+              }
             }
           }
+
+
         },
 
 
@@ -86,6 +120,12 @@ return {
     vim.keymap.set("n", "<leader>fb", Snacks.picker.pickers, { desc = "Pickers" })
     vim.keymap.set("n", "<leader>fp", Snacks.picker.projects, { desc = "Projects" })
     vim.keymap.set("n", "<leader>fj", Snacks.picker.lines, { desc = "Buffer lines" })
+    vim.keymap.set("n", "<leader>fd", Snacks.picker.diagnostics, { desc = "Diagnostics" })
+    vim.keymap.set("n", "<leader>fD", Snacks.picker.diagnostics_buffer, { desc = "Diagnostics buffer" })
+
+    vim.keymap.set("n", "<leader>fs", Snacks.picker.lsp_symbols, { desc = "Buffer symbols" })
+    vim.keymap.set("n", "<leader>fw", Snacks.picker.lsp_workspace_symbols, { desc = "workspace symbols" })
+    vim.keymap.set("n", "gt", Snacks.picker.lsp_type_definitions, { desc = "Diagnostics buffer" })
   end
 
   ---@type snacks.Config
