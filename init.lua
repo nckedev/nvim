@@ -318,11 +318,12 @@ require("lazy").setup({
   -- Code comapnion AI tools
   require("codecomp"),
 
-  require("_snacks"),
+  require("plugins.snacks"),
   -- require("plugins.nvim-cmp"),
   require("plugins.blink"),
   require("plugins.rust"),
   -- require("plugins.smear-cursor"),
+  require("plugins.lazygit"),
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following lua:
@@ -521,19 +522,19 @@ require("lazy").setup({
 
       -- See `:help telescope.builtin`
       local builtin = require("telescope.builtin")
-      vim.keymap.set("n", "<leader>ft", ":TodoTelescope<cr>", { desc = "Find TODOs NOTEs etc" })
+      -- vim.keymap.set("n", "<leader>ft", ":TodoTelescope<cr>", { desc = "Find TODOs NOTEs etc" })
       vim.keymap.set("n", "<leader>fq", builtin.quickfix, { desc = "Find within qf" })
       vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Find help tags" })
       vim.keymap.set("n", "<leader>fo", builtin.oldfiles, { desc = "Find old files" })
       -- vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
       -- vim.keymap.set("n", "<leader>fb", builtin.builtin, { desc = "Find telescope builtin" })
       -- vim.keymap.set("n", "<leader>fc", builtin.grep_string, { desc = "Find current word" })
-      vim.keymap.set("n", "<leader>fg", function()
-        builtin.live_grep({ grep_open_files = false, disable_coordinates = true })
-      end, { desc = "Find with Grep" })
-      vim.keymap.set("n", "<leader>fG", function()
-        builtin.live_grep({ grep_open_files = true, disable_coordinates = true })
-      end, { desc = "Find with Grep (open files)" })
+      -- vim.keymap.set("n", "<leader>fg", function()
+      --   builtin.live_grep({ grep_open_files = false, disable_coordinates = true })
+      -- end, { desc = "Find with Grep" })
+      -- vim.keymap.set("n", "<leader>fG", function()
+      --   builtin.live_grep({ grep_open_files = true, disable_coordinates = true })
+      -- end, { desc = "Find with Grep (open files)" })
       -- vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Find diagnostics" })
       -- vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "Resume last search" })
       vim.keymap.set("n", "<c-space>", function()
