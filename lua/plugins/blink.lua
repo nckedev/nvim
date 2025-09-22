@@ -55,6 +55,8 @@ local r = {
     keymap = {
       preset = 'super-tab',
       ["<cr>"] = { "select_and_accept", "fallback" },
+      ["<C-e>"] = { "show_documentation", "fallback" },
+      ["<C-q>"] = { "show_signature", "fallback" }
     },
 
     appearance = {

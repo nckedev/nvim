@@ -18,6 +18,9 @@ vim.opt.mouse = "a"
 -- Don't show the mode, since it's already in status line
 vim.opt.showmode = false
 
+-- the border of popups
+vim.o.winborder = "solid"
+
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
@@ -156,6 +159,7 @@ vim.opt.linespace = 1
 vim.opt.pumheight = 12
 vim.opt.pumwidth = 20
 vim.o.ts = 4
+vim.o.sw = 4
 
 -- when launching neovide from raycast it defaults to /
 if vim.g.neovide and vim.uv.cwd() == "/" then
@@ -164,7 +168,7 @@ end
 
 -- for pasting from ai
 vim.keymap.set("n", "<D-v>", "p")
-vim.keymap.set("n", "<cr>", ".")
+-- vim.keymap.set("n", "<cr>", ".")
 
 vim.keymap.set("n", "<leader>7", ":w<cr>:so /Users/nicke/.config/nvim/init.lua<cr>")
 vim.keymap.set("n", "<leader>6", ":w<cr>:color gray-base<cr>")
@@ -324,6 +328,11 @@ require("lazy").setup({
   require("plugins.rust"),
   -- require("plugins.smear-cursor"),
   require("plugins.lazygit"),
+
+  {
+    "nckedev/rs-macro-fmt.nvim",
+    opts = { str = "testint" },
+  },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following lua:
