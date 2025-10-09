@@ -331,7 +331,10 @@ require("lazy").setup({
 
   {
     "nckedev/rs-macro-fmt.nvim",
-    opts = { str = "testint" },
+    opts = {
+      enabled = true,
+      indent_size = 4
+    },
   },
 
   -- Here is a more advanced example where we pass configuration
