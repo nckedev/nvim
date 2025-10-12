@@ -116,6 +116,7 @@ return {
         },
       })
 
+    vim.keymap.set("n", "<leader>fe", Snacks.picker.explorer, { desc = "File explorer" })
     vim.keymap.set("n", "<leader>ff", Snacks.picker.files, { desc = "Files" })
     vim.keymap.set("n", "<leader>fb", Snacks.picker.pickers, { desc = "Pickers" })
     vim.keymap.set("n", "<leader>fp", Snacks.picker.projects, { desc = "Projects" })
