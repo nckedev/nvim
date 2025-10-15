@@ -1,3 +1,4 @@
+vim.keymap.set({ "n", "v" }, "<leader>cc", ":CodeCompanion<cr>")
 return {
     "olimorris/codecompanion.nvim",
     dependencies = {

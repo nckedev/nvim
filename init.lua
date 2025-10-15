@@ -166,6 +166,8 @@ if vim.g.neovide and vim.uv.cwd() == "/" then
   vim.cmd("cd ~")
 end
 
+vim.keymap.set("n", "<leader>gg", ":Gitsigns<cr>")
+
 -- for pasting from ai
 vim.keymap.set("n", "<D-v>", "p")
 -- vim.keymap.set("n", "<cr>", ".")
