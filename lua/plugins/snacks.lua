@@ -3,6 +3,7 @@ return {
   priority = 1000,
   lazy = false,
 
+  ---@type snacks.Config
   config = function()
     require("snacks").setup(
       {
@@ -24,7 +25,7 @@ return {
             input = {
               keys = {
                 ["<Esc>"] = { "close", mode = { "n", "i" } },
-                ["?"] = "toggle_help_input",
+                ["<C-+>"] = "toggle_help_input",
               }
             }
           },
@@ -121,23 +122,22 @@ return {
     vim.keymap.set("n", "<leader>fb", Snacks.picker.pickers, { desc = "Pickers" })
     vim.keymap.set("n", "<leader>fp", Snacks.picker.projects, { desc = "Projects" })
     vim.keymap.set("n", "<leader>fj", Snacks.picker.lines, { desc = "Buffer lines" })
+    vim.keymap.set("n", "<leader>fg", Snacks.picker.grep, { desc = "Grep" })
+    vim.keymap.set("n", "<leader>fG", Snacks.picker.grep_buffers, { desc = "Grep buffers" })
+    -- vim.keymap.set("n", "<leader>fgw", Snacks.picker.grep_word, { desc = "Grep word under cursor" })
+    vim.keymap.set("n", "<C-space>", Snacks.picker.buffers, { desc = "Current open buffers" })
+    -- lsp stuff
     vim.keymap.set("n", "<leader>fd", Snacks.picker.diagnostics, { desc = "Diagnostics" })
     vim.keymap.set("n", "<leader>fD", Snacks.picker.diagnostics_buffer, { desc = "Diagnostics buffer" })
     vim.keymap.set("n", "<leader>ft", function() Snacks.picker.todo_comments() end, { desc = "TODO comments" })
-    -- vim.keymap.set("n", "<leader>fr", Snacks.picker.resume, { desc = "Resume last" })
-
-
+    vim.keymap.set("n", "gd", Snacks.picker.lsp_definitions, { desc = "Goto Definition" })
+    vim.keymap.set("n", "gD", Snacks.picker.lsp_declarations, { desc = "Goto Definition" })
+    vim.keymap.set("n", "<leader>fi", Snacks.picker.lsp_implementations, { desc = "Find implementations" })
     vim.keymap.set("n", "<leader>fs", Snacks.picker.lsp_symbols, { desc = "Buffer symbols" })
     vim.keymap.set("n", "<leader>fw", Snacks.picker.lsp_workspace_symbols, { desc = "workspace symbols" })
     vim.keymap.set("n", "gt", Snacks.picker.lsp_type_definitions, { desc = "Type definition" })
     vim.keymap.set("n", "<leader>fr",
       function() Snacks.picker.lsp_references({ layout = { preview = "main" }, auto_confirm = false }) end,
       { desc = "References" })
-
-    vim.keymap.set("n", "<leader>fg", Snacks.picker.grep, { desc = "Grep" })
-    vim.keymap.set("n", "<leader>fG", Snacks.picker.grep_buffers, { desc = "Grep buffers" })
-    -- vim.keymap.set("n", "<leader>fgw", Snacks.picker.grep_word, { desc = "Grep word under cursor" })
   end
-
-  ---@type snacks.Config
 }
