@@ -112,6 +112,9 @@ return {
             },
             buffers = {
               current = false
+            },
+            git_diff = {
+              layout = { preview = "main" }
             }
           }
         },
