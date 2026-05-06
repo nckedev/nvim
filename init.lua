@@ -193,9 +193,9 @@ vim.keymap.set("n", "<D-o>", ":lua require('oil').toggle_float('.')<CR>")
 vim.keymap.set("n", "<D-O>", ":Oil<cr>")
 --
 -- Diagnostic keymaps
-vim.keymap.set("n", "gp", function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostics.severity.ERROR }) end,
+vim.keymap.set("n", "gp", function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR }) end,
   { desc = "Go to [P]revious diagnostic message" })
-vim.keymap.set("n", "gn", function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostics.severity.ERROR }) end,
+vim.keymap.set("n", "gn", function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR }) end,
   { desc = "Go to [N]ext diagnostic message" })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
