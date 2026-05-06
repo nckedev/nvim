@@ -1,7 +1,7 @@
 --ini
 --
 vim.opt.title = true
--- vim.opt.background = "light"
+vim.opt.background = "dark"
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -102,7 +102,8 @@ end
 -- DejaVuSansMono Nerd Font Mono
 -- vim.opt.guifont = "Liga SFMono Nerd Font:h15"
 -- vim.opt.guifont = "RobotoMono_Nerd_Font_Mono:h16"
-vim.opt.guifont = "JetBrainsMono_Nerd_Font:h16"
+-- vim.opt.guifont = "JetBrainsMono_Nerd_Font:h16"
+vim.opt.guifont = "IoskeleyMonoTerm Nerd Font:h16"
 vim.opt.linespace = 1
 vim.opt.pumheight = 12
 vim.opt.pumwidth = 20
@@ -178,6 +179,7 @@ vim.keymap.set(scope, "<C-j>", ")", { remap = true })
 vim.keymap.set(scope, "<C-g>", "[", { remap = true })
 vim.keymap.set(scope, "<C-h>", "]", { remap = true })
 vim.keymap.set(scope, "<D-n>", "_")
+vim.keymap.set(scope, "<D-y>", "|")
 vim.keymap.set(scope, "<D-m>", ":")
 vim.keymap.set(scope, "<D-,>", "_")
 vim.keymap.set(scope, "<D-.>", ":")
@@ -191,8 +193,10 @@ vim.keymap.set("n", "<D-o>", ":lua require('oil').toggle_float('.')<CR>")
 vim.keymap.set("n", "<D-O>", ":Oil<cr>")
 --
 -- Diagnostic keymaps
-vim.keymap.set("n", "gp", vim.diagnostic.goto_prev, { desc = "Go to [P]revious diagnostic message" })
-vim.keymap.set("n", "gn", vim.diagnostic.goto_next, { desc = "Go to [N]ext diagnostic message" })
+vim.keymap.set("n", "gp", function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostics.severity.ERROR }) end,
+  { desc = "Go to [P]revious diagnostic message" })
+vim.keymap.set("n", "gn", function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostics.severity.ERROR }) end,
+  { desc = "Go to [N]ext diagnostic message" })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
@@ -403,31 +407,36 @@ require("lazy").setup({
 
     { -- Highlight, edit, and navigate code
       "nvim-treesitter/nvim-treesitter",
+      branch = "main",
       build = ":TSUpdate",
-      config = function()
-        -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
-        ---@diagnostic disable-next-line: missing-fields
-        require("nvim-treesitter.configs").setup({
-          ensure_installed = { "bash", "c", "html", "lua", "markdown", "vim", "vimdoc", "rust" },
-          -- Autoinstall languages that are not installed
-          auto_install = true,
-          highlight = { enable = true },
-          indent = { enable = true },
+      init = function()
+        vim.api.nvim_create_autocmd('FileType', {
+          callback = function()
+            -- Enable treesitter highlighting and disable regex syntax
+            pcall(vim.treesitter.start)
+            -- Enable treesitter-based indentation
+            vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end,
         })
 
-        -- There are additional nvim-treesitter modules that you can use to interact
-        -- with nvim-treesitter. You should go explore a few and see what interests you:
-        --
-        --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-        --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-        --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+
+        local ensureInstalled = {
+          'lua', 'python', 'typescript', 'gleam',
+          -- ... your parsers
+        }
+        local alreadyInstalled = require('nvim-treesitter.config').get_installed()
+        local parsersToInstall = vim.iter(ensureInstalled)
+            :filter(function(parser)
+              return not vim.tbl_contains(alreadyInstalled, parser)
+            end)
+            :totable()
+        require('nvim-treesitter').install(parsersToInstall)
       end,
     },
 
-    {
-      "nvim-treesitter/playground",
-    },
+    -- {
+    --   "nvim-treesitter/playground",
+    -- },
     {
       "mg979/vim-visual-multi",
     },
@@ -437,21 +446,11 @@ require("lazy").setup({
     },
     {
       "nckedev/gray-base.nvim",
-      opts = {
-        monochrome_strings = false,
-        light = {
-          tint = {
-            hue = 35,
-            saturation = 5,
-          },
-          colors = {
-            primary = { hue = 35, lightness = 50 },
-            saturation = 45,
-            lightness = 55,
-            strings = 85,
-          },
-        },
-      },
+      opts = {},
+    },
+    {
+      "nckedev/semi-gui.nvim",
+      opts = {}
     },
     require('fzf'),
     {
@@ -486,20 +485,6 @@ require("lazy").setup({
       priority = 1000,
       config = function()
         require("nordic").load()
-      end,
-    },
-    {
-      "supermaven-inc/supermaven-nvim",
-      config = function()
-        require("supermaven-nvim").setup({
-          keymaps = {
-            accept_suggestion = "<c-7>",
-            accept_word = "<c-y>",
-          },
-          color = {
-            suggestion_color = "#8da9b0",
-          }
-        })
       end,
     },
     {
@@ -585,7 +570,7 @@ require("lazy").setup({
     },
   })
 
-vim.lsp.enable({ "lua_ls" })
+vim.lsp.enable({ "lua_ls", "gleam", "elm" })
 
 vim.diagnostic.config({
   virtual_text = false,

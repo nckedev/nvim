@@ -115,6 +115,18 @@ return {
             },
             git_diff = {
               layout = { preview = "main" }
+            },
+            grep = {
+              layout = { preview = "main" }
+            },
+            grep_buffers = {
+              layout = { preview = "main" }
+            },
+            diagnostics = {
+              layout = { preview = "main" }
+            },
+            diagnostics_buffer = {
+              layout = { preview = "main" }
             }
           }
         },

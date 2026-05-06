@@ -28,10 +28,16 @@ end
 local r = {
   'saghen/blink.cmp',
   -- optional: provides snippets for the snippet source
-  -- dependencies = { 'rafamadriz/friendly-snippets' },
+  dependencies = {
+    'saghen/blink.lib'
+    -- 'rafamadriz/friendly-snippets'
+  },
+  build = function()
+    require('blink.cmp').build():wait(60000)
+  end,
 
   -- use a release tag to download pre-built binaries
-  version = '1.*',
+  -- version = '1.*',
   -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
   -- build = 'cargo build --release',
   -- If you use nix, you can build from source using latest nightly rust with:
@@ -56,7 +62,9 @@ local r = {
       preset = 'super-tab',
       ["<cr>"] = { "select_and_accept", "fallback" },
       ["<C-e>"] = { "show_documentation", "fallback" },
-      ["<C-q>"] = { "show_signature", "fallback" }
+      ["<C-q>"] = { "show_signature", "fallback" },
+      ['<C-k>'] = { 'select_prev', 'fallback_to_mappings' },
+      ['<C-j>'] = { 'select_next', 'fallback_to_mappings' }
     },
 
     appearance = {
@@ -79,7 +87,7 @@ local r = {
           treesitter = { "lsp" },
           components = {
             -- you can make custom columns!
-            test = { text = function(ctx) return ctx.idx .. "" end },
+            -- test = { text = function(ctx) return ctx.idx .. "" end },
             label = {
               -- handle type for variable and macro! for macro
               -- handle snippets
@@ -98,36 +106,39 @@ local r = {
               },
             },
             -- experimental
-            label_extra = {
-              ellipsis = false,
-              width = {
-                fill = true,
-                max = 20
-              },
-              text = function(ctx)
-                local context_details = ctx.item.detail or ""
-                -- vim.print(ctx)
-                if is_rustanalyzer(ctx) and has_context_details(ctx) and is_func_or_method(ctx) and not needs_import(ctx) then
-                  local s, _ = string.find(context_details, "%(")
-                  local new_details = string.sub(context_details, s or 0)
-                  vim.print(new_details)
-                  return new_details or ""
-                else
-                  return ""
-                end
-              end
+            -- label_extra = {
+            --   ellipsis = false,
+            --   width = {
+            --     fill = true,
+            --     max = 20
+            --   },
+            --   text = function(ctx)
+            --     local context_details = ctx.item.detail or ""
+            --     -- vim.print(ctx)
+            --     if is_rustanalyzer(ctx) and has_context_details(ctx) and is_func_or_method(ctx) and not needs_import(ctx) then
+            --       local s, _ = string.find(context_details, "%(")
+            --       local new_details = string.sub(context_details, s or 0)
+            --       vim.print(new_details)
+            --       return new_details or ""
+            --     else
+            --       return ""
+            --     end
+            --   end
 
-              --   if string.find(ctx.item.detail or "", "^fn") ~= nil and string.find(ctx.label, "test") ~= nil then
-              --   vim.print(vim.inspect(ctx))
-              -- end
-              --   return ctx.label .. (ctx.item.detail  or "" )
-              -- end,
-            },
+            --   if string.find(ctx.item.detail or "", "^fn") ~= nil and string.find(ctx.label, "test") ~= nil then
+            --   vim.print(vim.inspect(ctx))
+            -- end
+            --   return ctx.label .. (ctx.item.detail  or "" )
+            -- end,
+            -- },
             right_col = {
               width = {
                 max = 20,
               },
               text = function(ctx)
+                if string.find(ctx.item.detail or "", "\n") then
+                  return "newline"
+                end
                 return ctx.item.detail or ""
               end,
               highlight = function()
