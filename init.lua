@@ -421,7 +421,7 @@ require("lazy").setup({
 
 
         local ensureInstalled = {
-          'lua', 'python', 'typescript', 'gleam',
+          'lua', 'python', 'typescript', 'gleam', 'roc',
           -- ... your parsers
         }
         local alreadyInstalled = require('nvim-treesitter.config').get_installed()
@@ -570,7 +570,7 @@ require("lazy").setup({
     },
   })
 
-vim.lsp.enable({ "lua_ls", "gleam", "elm" })
+vim.lsp.enable({ "lua_ls", "gleam", "elm", "roc" })
 
 vim.diagnostic.config({
   virtual_text = false,
