@@ -3,9 +3,9 @@ return {
   priority = 1000,
   lazy = false,
 
-  ---@type snacks.Config
   config = function()
     require("snacks").setup(
+    ---@type snacks.Config
       {
         bigfile = { enabled = false },
         dashboard = { enabled = false },
@@ -117,6 +117,18 @@ return {
               current = false
             },
             git_diff = {
+              layout = { preview = "main" }
+            },
+            git_log = {
+              layout = { preview = "main" }
+            },
+            git_log_line = {
+              layout = { preview = "main" }
+            },
+            git_log_file = {
+              layout = { preview = "main" }
+            },
+            git_status = {
               layout = { preview = "main" }
             },
             grep = {
