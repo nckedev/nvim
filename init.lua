@@ -145,6 +145,7 @@ vim.keymap.set({ "n", "x", "o" }, "<leader><leader>", "<cmd>Ctrlf<CR>")
 vim.keymap.set({ "n", "x", "o" }, "<C-f>", "<cmd>Ctrlf<CR>")
 vim.keymap.set("n", "<leader>ä", "<cmd>CtrlfNext<CR>")
 
+vim.keymap.set({ "n" }, "<C-q>", "q")
 vim.keymap.set({ "n", "o", "v" }, "q", "b")
 vim.keymap.set({ "n", "o", "v" }, "<S-q>", "<S-b>")
 vim.keymap.set("n", "<C-j>", "<C-d>")
