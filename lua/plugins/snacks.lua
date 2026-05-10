@@ -29,6 +29,8 @@ return {
                 ["<C-?>"] = { "toggle_help_input", mode = { "n", "i" } },
                 ["<D-j>"] = { "preview_scroll_down", mode = { "n", "i" } },
                 ["<D-k>"] = { "preview_scroll_up", mode = { "n", "i" } },
+                ["<C-D-j>"] = { "preview_scroll_down", mode = { "n", "i" } },
+                ["<C-D-k>"] = { "preview_scroll_up", mode = { "n", "i" } },
               }
             }
           },
